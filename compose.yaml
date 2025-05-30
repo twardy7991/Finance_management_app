@@ -1,0 +1,32 @@
+services: 
+
+  db:
+    image: postgres:16.9
+
+    ports: 
+      - "5432:5432"
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: finance_db
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/finance_db
+
+    restart: always
+    volumes: pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    volumes:
+      - ./backend/app:/app/app
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      - db
+
+
+volumes:
+  pgdata:
+

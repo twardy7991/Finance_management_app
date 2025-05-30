@@ -1,5 +1,5 @@
 import pandas as pd
-from Finance_calc.connection import Connection
+from connection import Connection
 
 class DataProcessor:
     
