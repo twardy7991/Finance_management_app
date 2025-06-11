@@ -1,12 +1,13 @@
 from fastapi import FastAPI
-from endpoints import example
+from app.endpoints.routes import Routing
 
-def app():
-    app = FastAPI()
 
-    app.include_router(example.router)
-    
-    return app
+app = FastAPI()
+apirouter = Routing()
+apirouter.configure_routes()
+app.include_router(apirouter.router)
+
+
 # import os
 # import pandas as pd
 
@@ -22,5 +23,4 @@ def app():
 # # Load the file
 # operations = pd.read_csv(csv_path, skiprows=25, delimiter=';')
 
-if __name__ == "__main__":
-    app()
+
