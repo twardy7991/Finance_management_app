@@ -6,7 +6,7 @@ from .services.services import UserService, DataService
 
 class Container(containers.DeclarativeContainer):
     
-    wiring_config = containers.WiringConfiguration(modules=[".endpoints"])
+    wiring_config = containers.WiringConfiguration(modules=[".endpoints.routes"])
 
     config = providers.Configuration(yaml_files=["config.yml"])
     
@@ -24,7 +24,7 @@ class Container(containers.DeclarativeContainer):
     
     data_repository = providers.Factory(
         DataRepository,
-        session_factory=db.factory.session,
+        session_factory=db.provided.session,
     ) 
     
     data_service = providers.Factory(

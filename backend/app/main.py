@@ -1,18 +1,23 @@
 from fastapi import FastAPI
 from app.endpoints.routes import Routing
 from .containers import Container
+import uvicorn
 
-def create_app() -> FastAPI:
+def app() -> FastAPI:
 
     container = Container()   
-    db = container.db()    
+    container.wire(modules=[".endpoints.routes"]) 
     
+    # Create app and routing
     app = FastAPI()
-    apirouter = Routing()
-    apirouter.configure_routes()
-    app.include_router(apirouter.router)
-
+    router = Routing()
+    
+    # Setup injected routes after wiring
+    router.setup_injected_routes()
+    
+    app.include_router(router.router)
     return app
+
 
 # import os
 # import pandas as pd
@@ -29,5 +34,3 @@ def create_app() -> FastAPI:
 # # Load the file
 # operations = pd.read_csv(csv_path, skiprows=25, delimiter=';')
 
-
-app = create_app()

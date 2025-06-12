@@ -1,4 +1,4 @@
-from database.repositories import DataRepository
+from app.database.repositories import DataRepository
 from typing import List
 from app.database.models.models import Operation
 

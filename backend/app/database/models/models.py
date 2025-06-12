@@ -2,10 +2,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey, VARCHAR, Text, DATE, NUMERIC
 from datetime import date
 from typing import List
-from app.db import SQLconnection
-
-connection = SQLconnection()
-Base = connection.Base
+from app.db import Base
 
 class User(Base):
 
