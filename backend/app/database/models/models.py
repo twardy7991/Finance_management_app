@@ -25,7 +25,16 @@ class User(Base):
         self.surname = surname
         self.telephone = telephone
         self.address = address
-
+        
+    def __repr__(self):
+        
+        return f'''User(id={self.id})" 
+                    name={self.name}
+                    surname={self.surname}
+                    telephone={self.telephone}
+                    address={self.address}
+            '''
+            
 class Credential(Base):
     
     __tablename__ = 'credentials'
@@ -41,6 +50,11 @@ class Credential(Base):
         self.user_id = user_id
         self.username = username
         self.password = password
+        
+    def __repr__(self):
+        return f'''Credential(credential_id={self.credential_id}, 
+                    user_id={self.user_id}, 
+                    username='{self.username}')"'''
 
 class Operation(Base):
     
@@ -63,3 +77,12 @@ class Operation(Base):
         self.description = description
         self.value = value
         self.currency = currency
+        
+    def __repr__(self):
+        return f'''Operation(operation_id={self.operation_id}, 
+                    user_id={self.user_id}, 
+                    operation_date='{self.operation_date}', 
+                    category='{self.category}', 
+                    description='{self.description}', 
+                    value={self.value}, 
+                    currency='{self.currency}')'''

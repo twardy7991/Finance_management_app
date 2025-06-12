@@ -1,22 +1,20 @@
-from fastapi import APIRouter, Depends
-from app.database.controllers.data_service import DataService
+from fastapi import APIRouter, Depends, Response, status
+from projects.Finance_calc.backend.app.database.repositories import DataService
 from app.endpoints.schemas import UserId
-from app.db import SQLconnection
+from dependency_injector.wiring import Provide, inject
+from database.repositories import DataNotFound
+from typing import Annotated
+from services.services import DataService
+from containers import Container
 
-connection = SQLconnection()
 
 ## we create funtion to point to the get_session from SQLconnection class so we can use it in Depends() 
 ## we create is outside the class as Depends() cannot use self.*** as it is in function parentheses
-def get_session(): 
-    yield from connection.get_session()
 
 class Routing:
 
     def __init__(self):
         self.router = APIRouter()
-
-    def get_data_service(self, session=Depends(get_session)):
-        return DataService(session)
 
     def configure_routes(self): 
 
@@ -25,10 +23,16 @@ class Routing:
             return {"message": "Hello from FastAPI"}
 
         @self.router.post("/user/data")
+        @inject
         def get_user_finance_data(
             userid: UserId, 
-            data_service : DataService = Depends(self.get_data_service)
+            data_service: Annotated[DataService, Depends(Provide[Container.data_service])],
             ):
-            return data_service.get_user_finance_data(userid.user_id)
-        
-    
+            try:
+                return data_service.get_user_operations(userid.user_id)
+            except DataNotFound:
+                return Response(staus_code=status.HTTP_404_NOT_FOUND)
+
+        @self.router.get("/status")
+        def get_status():
+            return {"status": "OK"}

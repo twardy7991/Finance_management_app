@@ -1,12 +1,18 @@
 from fastapi import FastAPI
 from app.endpoints.routes import Routing
+from .containers import Container
 
+def create_app() -> FastAPI:
 
-app = FastAPI()
-apirouter = Routing()
-apirouter.configure_routes()
-app.include_router(apirouter.router)
+    container = Container()   
+    db = container.db()    
+    
+    app = FastAPI()
+    apirouter = Routing()
+    apirouter.configure_routes()
+    app.include_router(apirouter.router)
 
+    return app
 
 # import os
 # import pandas as pd
@@ -24,3 +30,4 @@ app.include_router(apirouter.router)
 # operations = pd.read_csv(csv_path, skiprows=25, delimiter=';')
 
 
+app = create_app()
