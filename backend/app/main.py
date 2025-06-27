@@ -2,14 +2,32 @@ from fastapi import FastAPI
 from app.endpoints.routes import Routing
 from .containers import Container
 import uvicorn
+from contextlib import asynccontextmanager
+from app.containers import Container
+from sqlalchemy import text
 
 def app() -> FastAPI:
 
     container = Container()   
     container.wire(modules=[".endpoints.routes"]) 
     
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
+        print("Application startup...")
+        try:
+            db_service = container.db()
+            db_service.check_connection()
+        except ConnectionError as e:
+            print(f"Critical Error: Could not connect to the database.")
+            raise RuntimeError("Database not available. The application will not start.") from e
+
+        yield
+
+        print("Application shutdown.")
+    
     # Create app and routing
-    app = FastAPI()
+    app = FastAPI(lifespan=lifespan)
+    
     router = Routing()
     
     # Setup injected routes after wiring
@@ -19,6 +37,9 @@ def app() -> FastAPI:
     return app
 
 
+    
+    
+    
 # import os
 # import pandas as pd
 
@@ -33,4 +54,3 @@ def app() -> FastAPI:
 
 # # Load the file
 # operations = pd.read_csv(csv_path, skiprows=25, delimiter=';')
-
