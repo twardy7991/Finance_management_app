@@ -3,12 +3,12 @@ from .db import Database
 from .database.repositories import DataRepository, UserRepository
 from .services.services import UserService, DataService
 
-
 class Container(containers.DeclarativeContainer):
     
     wiring_config = containers.WiringConfiguration(modules=[".endpoints.routes"])
-
-    config = providers.Configuration(yaml_files=["config.yml"])
+    
+    config = providers.Configuration()
+    config.from_yaml("config/config.yml")
     
     db = providers.Singleton(Database, db_url=config.db.url) ##singleton creates the instance once and saves it
     
@@ -31,3 +31,4 @@ class Container(containers.DeclarativeContainer):
         DataService,
         data_repository=data_repository,
     )
+    

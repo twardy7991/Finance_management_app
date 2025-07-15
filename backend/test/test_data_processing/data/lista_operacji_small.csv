@@ -1,0 +1,29 @@
+mBank S.A. Bankowość Detaliczna;
+		Skrytka Pocztowa 2108;
+		90-959 Łódź 2;
+		www.mBank.pl;
+		mLinia: 801 300 800;
+		+48 (42) 6 300 800;
+		
+
+#Klient;
+JAN MARCJAN KOWALSKI; 
+
+Lista operacji;
+
+#Za okres:;
+01.10.2024;25.02.2025;
+
+#zgodnie z wybranymi filtrami wyszukiwania;
+      #dla rachunków:;
+      eKonto - 92571582598864422429916351; 
+      
+      #Lista nie jest dokumentem w rozumieniu art. 7 Ustawy Prawo Bankowe (Dz. U. Nr 140 z 1997 roku, poz.939 z późniejszymi zmianami), ponieważ operacje można samodzielnie edytować.;
+      
+      #Waluta;#Wpływy;#Wydatki;
+PLN;26 112,35;-11 638,48; 
+
+#Data operacji;#Opis operacji;#Rachunek;#Kategoria;#Kwota;;
+2025-02-23;"ZUS ODDZIAŁ ŁÓDŹ  PRZELEW PRZYCHODZĄCY";"eKonto 2811 ... 1888";"Wpływy stałe";3500,00 PLN;;
+2025-02-22;"SHELL STACJA PALIW 1234  ZAKUP PRZY UŻYCIU KARTY W KRAJU";"eKonto 2811 ... 1888";"Transport i paliwo";-239,99 PLN;;
+2025-02-21;"ALLEGRO.PL PŁATNOŚĆ BLIK P2P";"eKonto 2811 ... 1888";"Zakupy online";-125,00 PLN;;

@@ -59,16 +59,16 @@ INSERT INTO credentials (user_id, username, password) VALUES
 -- INSERT FINANCIAL OPERATIONS
 -- ========================
 
-INSERT INTO financial_operations (operation_id, user_id, operation_date, category, description, value, currency) VALUES
+INSERT INTO financial_operations (user_id, operation_date, category, description, value, currency) VALUES
 -- John
 (1, '2025-05-20', 'Groceries', 'Walmart grocery shopping', 75.20, 'USD'),
 (1, '2025-05-21', 'Transport', 'Uber to downtown', 15.00, 'USD'),
 (1, '2025-05-21', 'Entertainment', 'Netflix subscription', 12.99, 'USD'),
 
 -- Jane
-(DEFAULT, 2, '2025-05-18', 'Utilities', 'Electricity bill', 65.75, 'USD'),
-(DEFAULT, 2, '2025-05-19', 'Dining', 'Dinner at Luigi''s', 45.00, 'USD'),
-(DEFAULT, 2, '2025-05-22', 'Health', 'Pharmacy purchase', 22.10, 'USD'),
+(2, '2025-05-18', 'Utilities', 'Electricity bill', 65.75, 'USD'),
+(2, '2025-05-19', 'Dining', 'Dinner at Luigi''s', 45.00, 'USD'),
+(2, '2025-05-22', 'Health', 'Pharmacy purchase', 22.10, 'USD'),
 
 -- Alice
 (3, '2025-05-17', 'Travel', 'Train ticket to Capital City', 30.00, 'USD'),

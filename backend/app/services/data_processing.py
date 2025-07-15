@@ -1,46 +1,77 @@
 import pandas as pd
-from connection import Connection
+from app.services.connection import Connection
+from typing import BinaryIO
+import io
 
 class DataProcessor:
     
-    def __init__(self):
-        pass
+    def __init__(self, operations : pd.DataFrame):
+        
+        self.operations : pd.DataFrame = operations
     
-    def process_file(path):
-        operations = pd.read_csv(path, skiprows=25, delimiter=';')
+    def _preprocess_file(self):
+    
+        self._correct_datatypes()
+        self._extract_currency()
+        self._delete_unused_columns()
+
+    def _correct_datatypes(self):
         
-        operations["#Data operacji"] = pd.to_datetime(operations["#Data operacji"])
+        self.operations["#Data operacji"] = pd.to_datetime(self.operations["#Data operacji"])
         
-        operations.drop(columns=operations.columns[[2,5,6]], inplace=True)
+        self.operations["#Kategoria"] = self.operations["#Kategoria"].apply(lambda x: str(x))
         
-        operations[['Kwota', 'Waluta']] = operations['#Kwota'].str.extract(r'([-\d,\.]+)\s*(\D+)')
+    def _extract_currency(self):
         
-        operations.drop(columns=["#Kwota"], inplace=True)
+        self.operations[['Kwota', 'Waluta']] = self.operations['#Kwota'].str.extract(r'([-\d,\.]+)\s*(\D+)')
         
-        operations["#Kategoria"] = operations["#Kategoria"].apply(lambda x: str(x))
+        self.operations["Kwota"] = self.operations["Kwota"].str.replace(',','.').astype('float')
+
+    def _delete_unused_columns(self):
         
-        operations.loc[
-            operations["#Opis operacji"].str.contains(r'\bBLIK P2P\b', regex=True), "#Kategoria"
+        self.operations.drop(columns=self.operations.columns[[2,4,5,6]], inplace=True)
+        
+    def _correct_categories(self):
+        
+        self._extract_correct_categories()
+        self._fill_missing_categories()
+
+    def _extract_correct_categories(self):
+        
+        self.operations.loc[
+            self.operations["#Opis operacji"].str.contains(r'\bBLIK P2P\b', regex=True), "#Kategoria"
         ] = "BLIK"
 
-        operations.loc[
-            operations["#Opis operacji"].str.contains(r'\b\bPRZELEW|przelew\b\b', regex=True), "#Kategoria"
+        self.operations.loc[
+            self.operations["#Opis operacji"].str.contains(r'\b\bPRZELEW|przelew\b\b', regex=True), "#Kategoria"
         ] = "PRZELEW"
+    
+        self.operations["#Opis operacji"] = self.operations["#Opis operacji"].str.strip()
+    
+    def _fill_missing_categories(self):
         
-        operations["#Opis operacji"] = operations["#Opis operacji"].str.strip()
+        # categories = self.operations["#Kategoria"].unique().tolist()
         
-        categories = operations["#Kategoria"].unique().tolist()
+        # conn = Connection()
         
-        conn = Connection()
+        # for index in self.operations.index[self.operations["#Kategoria"] == "Bez kategorii"]:
+        #     response = conn.category_definition_gemini(self.operations.at[index, "#Opis operacji"], categories=categories)
+        #     self.operations.at[index, "#Kategoria"] = response
         
-        for index in operations.index[operations["#Kategoria"] == "Bez kategorii"]:
-            response = conn.category_definition_gemini(operations.at[index, "#Opis operacji"], categories=categories)
-            operations.at[index, "#Kategoria"] = response
-
-        operations["Kwota"] = operations["Kwota"].str.replace(',','.')
+        return self
+    
+def process_file(operations : BinaryIO):
         
-        operations["Kwota"] = operations["Kwota"].astype('float')
+    processor = DataProcessor(pd.read_csv(operations, skiprows=25, sep=";"))
+    processor._preprocess_file()
+    print(processor.operations)
+    processor._correct_categories()
+    print(processor.operations)
+    return processor.operations
         
-        
-        
+def get_unsaved_operations(saved_operations : pd.DataFrame, new_operations : pd.DataFrame) -> pd.DataFrame:
+    
+    operations_to_add = new_operations[~new_operations.apply(tuple, 1).isin(pd.DataFrame(saved_operations).apply(tuple, 1))].reset_index(drop=True)
+    
+    return operations_to_add
         

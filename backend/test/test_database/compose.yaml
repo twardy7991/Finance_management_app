@@ -1,0 +1,19 @@
+services: 
+
+  db:
+    image: postgres:16.1
+
+    ports: 
+      - "5422:5432"
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: finance_db_test
+    restart: always
+    volumes: 
+      #- pgdata_test:/var/lib/postgresql/data
+      - ./initdb:/docker-entrypoint-initdb.d:ro
+
+# volumes:
+#   pgdata_test:

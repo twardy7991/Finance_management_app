@@ -15,13 +15,6 @@ class User(Base):
     
     credential: Mapped['Credential'] = relationship(back_populates="user")
     operations: Mapped[List['Operation']] = relationship(back_populates="user")
-    
-    def __init__(self, name, surname, telephone, address):
-
-        self.name = name
-        self.surname = surname
-        self.telephone = telephone
-        self.address = address
         
     def __repr__(self):
         
@@ -41,17 +34,12 @@ class Credential(Base):
     password: Mapped[str] = mapped_column(VARCHAR(50), unique=True, nullable=False)
     
     user: Mapped['User'] = relationship(back_populates="credential")
-
-    def __init__(self, user_id, username, password):
-
-        self.user_id = user_id
-        self.username = username
-        self.password = password
         
     def __repr__(self):
         return f'''Credential(credential_id={self.credential_id}, 
                     user_id={self.user_id}, 
                     username='{self.username}')"'''
+
 
 class Operation(Base):
     
@@ -66,14 +54,16 @@ class Operation(Base):
     
     user: Mapped['User'] = relationship(back_populates="operations")
     
-    def __init__(self, user_id, operation_date, category, description, value, currency):
-
-        self.user_id = user_id
-        self.operation_date = operation_date
-        self.category = category
-        self.description = description
-        self.value = value
-        self.currency = currency
+    # needed for testing, to disregard the operation_id
+    def is_equal(self, other) -> bool:
+        return (
+            self.user_id == other.user_id and
+            self.operation_date == other.operation_date and
+            self.category == other.category and
+            self.description == other.description and
+            self.value == other.value and
+            self.currency == other.currency
+        )    
         
     def __repr__(self):
         return f'''Operation(operation_id={self.operation_id}, 
