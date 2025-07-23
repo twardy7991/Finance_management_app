@@ -4,8 +4,6 @@ from .containers import Container
 from contextlib import asynccontextmanager
 from app.containers import Container
 
-from pathlib import Path
-
 class ConfigError(Exception):
     
     def __init__(self, message : str):
@@ -18,7 +16,6 @@ class DatabaseURLMissingError(ConfigError):
 
 def create_app() -> FastAPI:
     
-
     container = Container()   
       
     print("Loaded config:", container.config())
@@ -30,6 +27,7 @@ def create_app() -> FastAPI:
         try:
             db_service = container.db()
             db_service.check_connection()    
+            
         ##throwed if database is unavailable
         except ConnectionError as e:
             raise RuntimeError("Database not available. The application will not start.") from e

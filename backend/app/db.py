@@ -1,9 +1,8 @@
 """ class that handles the connection with the sql server """
 
-from sqlalchemy import create_engine, text, Transaction, Connection
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy import create_engine, text, Connection
+from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
-from typing import Generator
 from sqlalchemy import orm
 from contextlib import contextmanager
 from sqlalchemy.exc import OperationalError

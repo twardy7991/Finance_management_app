@@ -2,9 +2,9 @@ FROM continuumio/miniconda3
 
 WORKDIR /app
 
-COPY enviroment.yaml .
+COPY enviroment.yml .
 
-RUN conda env create -f enviroment.yaml python=3.13
+RUN conda env create -f enviroment.yml python=3.13
 
 # Make sure the environment is activated when container runs
 SHELL ["conda", "run", "-n", "myenv", "/bin/bash", "-c"]

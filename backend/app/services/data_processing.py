@@ -1,7 +1,5 @@
 import pandas as pd
-from app.services.connection import Connection
 from typing import BinaryIO
-import io
 
 class DataProcessor:
     

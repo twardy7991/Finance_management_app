@@ -40,7 +40,6 @@ class Credential(Base):
                     user_id={self.user_id}, 
                     username='{self.username}')"'''
 
-
 class Operation(Base):
     
     __tablename__ = 'financial_operations'
@@ -54,7 +53,7 @@ class Operation(Base):
     
     user: Mapped['User'] = relationship(back_populates="operations")
     
-    # needed for testing, to disregard the operation_id
+    # needed for testing, to ignore the operation_id
     def is_equal(self, other) -> bool:
         return (
             self.user_id == other.user_id and
