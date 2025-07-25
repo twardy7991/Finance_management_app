@@ -1,10 +1,14 @@
-from sqlalchemy import select, insert
-from app.database.models.models import Operation, User, Credential
+from app.database.models import Operation, User, Credential
+from app.database.exceptions import UserNotProvidedError, UserNotSavedError, DataNotFound 
+from app.database.utils.utils import stmt_parser
+
 from sqlalchemy.orm import Session, sessionmaker
-from typing import List
+from typing import List, Tuple
 from datetime import date
+from sqlalchemy import select, insert
 import logging
 from pandas import DataFrame
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) 
@@ -12,25 +16,6 @@ handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
-
-class NotFound(Exception):
-    
-    entity: str
-    
-    def __init__(self, entity):
-        super().__init__(f"{self.entity} not found")
-
-class DataNotFound(NotFound):
-    
-    entity: str = "Data"
-
-class UserNotProvidedError(Exception):
-    
-    super.__init__("user_id was not provided")
-    
-class UserNotSavedError(Exception):
-    
-    super.__init__("user was not saved to the database")
 
 class DataRepository:
 
@@ -41,23 +26,14 @@ class DataRepository:
     def get_user_operations(self, 
                             user_id: int, 
                             date_from : date | None = None,
-                            date_to : date | None = None):
+                            date_to : date | None = None,
+                            order : str | None = "asc",
+                            type : str | None = None,
+                            group_by : str | None = None
+                            ) -> List[Operation]:
         
-        conditions = []
+        stmt = stmt_parser(user_id, date_from, date_to, order, type, group_by)
         
-        if user_id is None:
-            raise UserNotProvidedError
-        
-        conditions.append(Operation.user_id == user_id)
-            
-        if date_from is not None:
-            conditions.append(Operation.operation_date >= date_from)
-        
-        if date_to is not None:
-            conditions.append(Operation.operation_date <= date_to)
-        
-        stmt = select(Operation).where(*conditions)
-
         with self.session_factory() as session:
             
             session : Session
@@ -73,7 +49,10 @@ class DataRepository:
         
             return values
         
-    def add_operations(self, data_file : DataFrame, user_id : int) -> None:
+    def add_operations(self, 
+                       data_file : DataFrame, 
+                       user_id : int
+                       ) -> None:
         
         operations = [Operation(
                 user_id=user_id,
@@ -94,11 +73,16 @@ class DataRepository:
         
 class UserRepository:
     
-        def __init__(self, session_factory : sessionmaker[Session]):
+        def __init__(self, session_factory : sessionmaker[Session]) -> int:
         
             self.session_factory : Session = session_factory
             
-        def save_user(self ,name : str, surname : str, telephone : str, address : str):
+        def save_user(self ,
+                      name : str, 
+                      surname : str, 
+                      telephone : str, 
+                      address : str
+                      ) -> int:
             
             stmt = insert(User).values(name=name, surname=surname, telephone=telephone, address=address)
             
@@ -125,7 +109,11 @@ class CredentialRepository:
     
         self.session_factory : Session = session_factory
         
-    def save_credentials(self, user_id : int, username : str, hashed_password : str):
+    def save_credentials(self, 
+                         user_id : int, 
+                         username : str, 
+                         hashed_password : str
+                         ) -> None:
         
         stmt = insert(Credential).values(user_id = user_id, username=username, password=hashed_password)
         
@@ -140,7 +128,9 @@ class CredentialRepository:
             session.commit()
             
             
-    def get_credentials(self, username):
+    def get_credentials(self, 
+                        username : str
+                        ) -> Tuple[int, str, str]:
         
         stmt = select(Credential).where(username=username)
         

@@ -1,5 +1,8 @@
+from app.database.models import Operation
+
 import pandas as pd
-from typing import BinaryIO
+from typing import BinaryIO, List
+from datetime import date, datetime
 
 class DataProcessor:
     
@@ -16,6 +19,7 @@ class DataProcessor:
     def _correct_datatypes(self):
         
         self.operations["#Data operacji"] = pd.to_datetime(self.operations["#Data operacji"])
+        self.operations.sort_values("#Data operacji", ascending=False, inplace=True)
         
         self.operations["#Kategoria"] = self.operations["#Kategoria"].apply(lambda x: str(x))
         
@@ -58,7 +62,7 @@ class DataProcessor:
         
         return self
     
-def process_file(operations : BinaryIO):
+def process_file(operations : BinaryIO) -> pd.DataFrame:
         
     processor = DataProcessor(pd.read_csv(operations, skiprows=25, sep=";"))
     processor._preprocess_file()
@@ -67,9 +71,33 @@ def process_file(operations : BinaryIO):
     print(processor.operations)
     return processor.operations
         
-def get_unsaved_operations(saved_operations : pd.DataFrame, new_operations : pd.DataFrame) -> pd.DataFrame:
+def get_unsaved_operations(saved_operations : List[Operation], new_operations : pd.DataFrame) -> pd.DataFrame:
     
-    operations_to_add = new_operations[~new_operations.apply(tuple, 1).isin(pd.DataFrame(saved_operations).apply(tuple, 1))].reset_index(drop=True)
-    
-    return operations_to_add
+    saved_operations : pd.DataFrame = pd.DataFrame([[o.operation_date, o.category, o.description, o.value, o.currency] for o in saved_operations], columns=["#Data operacji","#Kategoria","#Opis operacji","Kwota","Waluta"])
+    saved_operations["#Data operacji"] = pd.to_datetime(saved_operations["#Data operacji"])
+    saved_operations["Kwota"] = saved_operations["Kwota"].astype(float)
+
         
+    # print(saved_operations.dtypes)
+    # print(new_operations.dtypes)
+    
+    # print(saved_operations)
+    # print(new_operations)
+
+    merged_df = new_operations.merge(saved_operations, how='left', indicator=True)
+
+    operations_to_add = merged_df[merged_df['_merge'] == 'left_only'].drop(columns=['_merge'])
+
+    # print(operations_to_add)
+    return operations_to_add
+
+def date_to_int(operations : List[Operation]):
+    
+        interval = 86400.0
+        
+        determinant = datetime.strptime(str(operations[0].operation_date), '%Y-%m-%d').timestamp()
+        
+        data = [[(datetime.strptime(str(o.operation_date), '%Y-%m-%d').timestamp() - determinant) / interval, float(o.value)] for o in operations]
+        
+        return data
+    

@@ -1,6 +1,7 @@
 """ TESTS FOR DATA PROCESSING MODULE """
 
-from app.services.data_processing import DataProcessor, get_unsaved_operations
+from app.services.utils.data_processing import DataProcessor, get_unsaved_operations, date_to_int
+
 import pandas as pd
 
 def test_file_preprocessing(dataframe):
@@ -57,8 +58,6 @@ def test_get_unsaved_operations_all_in_database(processed_dataframe):
     operations_to_save["#Data operacji"] = pd.to_datetime(operations_to_save["#Data operacji"])
     operations_to_save["Kwota"] = operations_to_save["Kwota"].astype('float64')
     
-    print(get_unsaved_operations(saved_operations=saved_operations, new_operations=processed_dataframe))
-    
     pd.testing.assert_frame_equal(
         get_unsaved_operations(saved_operations=saved_operations, new_operations=processed_dataframe),
         operations_to_save                                   
@@ -112,3 +111,11 @@ def test_get_unsaved_operations_none_in_database(processed_dataframe):
         get_unsaved_operations(saved_operations=saved_operations, new_operations=processed_dataframe),
         operations_to_save                                   
         )   
+    
+
+def test_date_to_int(operations):
+    
+    data = [[0.0, -125.0], [1.0, -239.99], [2.0, 3500.00]]
+    
+    assert date_to_int(operations) == data
+    

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.endpoints.routes import Routing
+from app.endpoints.routes import router
 from .containers import Container
 from contextlib import asynccontextmanager
 from app.containers import Container
@@ -39,12 +39,7 @@ def create_app() -> FastAPI:
     app = FastAPI(lifespan=lifespan)
     app.container = container
     
-    router = Routing()
-    
-    # Setup injected routes after wiring
-    router.setup_injected_routes()
-    
-    app.include_router(router.router)
+    app.include_router(router)
     return app
 
 app = create_app()

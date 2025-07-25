@@ -1,6 +1,6 @@
 from app.main import app
-from app.services.services import DataService
-from app.database.models.models import Operation
+from app.services.data_service import DataService
+from app.database.models import Operation
 
 from unittest import mock
 

@@ -1,7 +1,7 @@
 from app.database.repositories import DataRepository
 from sqlalchemy.orm import Session
-from app.services.services import DataService
-from app.database.models.models import Operation
+from app.services.data_service import DataService
+from app.database.models import Operation
 from datetime import date
 from decimal import Decimal
 
@@ -19,7 +19,7 @@ def test_save_user_operations(session : Session, operations_to_save):
         print("plik", type(f))
         data_service.save_user_operations(user_id = 2, datafile=f)
         
-    print(data_repository.get_user_operations(user_id = 2))
+    #print(data_repository.get_user_operations(user_id = 2))
     
     saved_operations = data_repository.get_user_operations(user_id = 2)
     

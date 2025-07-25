@@ -1,10 +1,23 @@
 class AuthError(Exception): pass
 
-class UserNotFoundError(AuthError):
-    super().__init__("user was not found in database")
-
 class PasswordIncorrectError(AuthError):
-    super().__init__("password is incorrect")
+    def __init__(self):
+        super().__init__("password is incorrect")
     
 class TokenNotValidError(AuthError):
-    super().__init__("could not validate the token")
+    
+    def __init__(self):
+        super().__init__("could not validate the token")
+        
+class ServiceError(Exception): pass
+
+class OperationsNotFoundError(ServiceError):
+    
+    def __init__(self, message) :
+        super().__init__(message)
+    
+class UserNotFoundError(ServiceError):
+    
+    def __init__(self):
+        super().__init__("user was not found in database")
+

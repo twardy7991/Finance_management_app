@@ -1,7 +1,7 @@
 import pytest
 from datetime import date
 from decimal import Decimal
-from app.database.models.models import Operation
+from app.database.models import Operation
 
 @pytest.fixture
 def operations_to_save():

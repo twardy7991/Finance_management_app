@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import date
+from typing import List
 
 class OperationConditions(BaseModel):
     user_id : int 
@@ -23,4 +24,9 @@ class CreateUserRequest(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    
+class Data(BaseModel):
+    coef : float
+    intercept : float
+    prediction : List[float]
         

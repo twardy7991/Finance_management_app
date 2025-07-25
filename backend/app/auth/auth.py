@@ -1,12 +1,9 @@
-from passlib.context import CryptContext
 from app.auth.utils.load_config import SECRET_KEY, ALGORITHM
+
+from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import jwt
 from fastapi.security import OAuth2PasswordBearer
-from app.containers import Container
-from dependency_injector.providers import Provider
-
-
 
 class AuthenticationTools:
     

@@ -1,2 +1,5 @@
 db:
   url: postgresql+psycopg2://postgres:postgres@localhost:5432/finance_db
+
+compute:
+  url: http://127.0.0.1:8001

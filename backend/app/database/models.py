@@ -1,8 +1,10 @@
+from app.db import Base
+
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey, VARCHAR, Text, DATE, NUMERIC
 from datetime import date
 from typing import List
-from app.db import Base
+from decimal import Decimal
 
 class User(Base):
 
@@ -48,7 +50,7 @@ class Operation(Base):
     operation_date: Mapped[date] = mapped_column(DATE, nullable=False)
     category: Mapped[str] = mapped_column(VARCHAR(50), nullable=True)
     description: Mapped[str] = mapped_column(Text(), nullable=True)
-    value: Mapped[int] = mapped_column(NUMERIC(12,2), nullable=False)
+    value: Mapped[Decimal] = mapped_column(NUMERIC(12,2, asdecimal=True), nullable=False)
     currency: Mapped[str] = mapped_column(VARCHAR(10), nullable=False)  
     
     user: Mapped['User'] = relationship(back_populates="operations")

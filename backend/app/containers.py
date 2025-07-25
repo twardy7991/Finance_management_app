@@ -1,9 +1,14 @@
-from dependency_injector import containers, providers
 from .db import Database
-from .database.repositories import DataRepository, UserRepository, CredentialRepository
-from .services.services import UserService, DataService, AuthenticationService
-from app.auth import auth
+from app.database.repositories import DataRepository, UserRepository, CredentialRepository
+from app.services.authentication_services import AuthenticationService
+from app.services.compute_service import ComputingService
+from app.services.user_service import UserService
+from app.services.data_service import DataService
+from app.auth.auth import AuthenticationTools 
+from app.services.utils.clients import ComputeClient
+
 from fastapi.security import OAuth2PasswordBearer
+from dependency_injector import containers, providers
 
 class Container(containers.DeclarativeContainer):
     
@@ -12,9 +17,9 @@ class Container(containers.DeclarativeContainer):
     config = providers.Configuration()
     config.from_yaml("config/config.yml")
     
-    db = providers.Singleton(Database, db_url=config.db.url) ##singleton creates the instance once and saves it
+    db = providers.Singleton(Database, db_url=config.db.url) 
     
-    user_repository = providers.Factory(  ## Factory as the name suggests creates the new instance every time it is called 
+    user_repository = providers.Factory(  
         UserRepository,
         session_factory=db.provided.session,
         )
@@ -45,11 +50,22 @@ class Container(containers.DeclarativeContainer):
     )
     
     auth_tools = providers.Factory(
-        auth,
+        AuthenticationTools,
     )
     
     oauth2_bearer = providers.Factory(
         oauth2_bearer=OAuth2PasswordBearer(tokenUrl='auth/token')
+    )
+    
+    compute_client = providers.Factory(
+        ComputeClient,
+        base_url = config.compute.url
+    )
+    
+    compute_service = providers.Factory(
+        ComputingService,
+        compute_client = compute_client,
+        data_repository = data_repository
     )
     
     
