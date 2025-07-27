@@ -76,19 +76,25 @@ def get_unsaved_operations(saved_operations : List[Operation], new_operations : 
     saved_operations : pd.DataFrame = pd.DataFrame([[o.operation_date, o.category, o.description, o.value, o.currency] for o in saved_operations], columns=["#Data operacji","#Kategoria","#Opis operacji","Kwota","Waluta"])
     saved_operations["#Data operacji"] = pd.to_datetime(saved_operations["#Data operacji"])
     saved_operations["Kwota"] = saved_operations["Kwota"].astype(float)
-
         
     # print(saved_operations.dtypes)
     # print(new_operations.dtypes)
     
-    # print(saved_operations)
-    # print(new_operations)
+    pd.set_option("display.max_rows", None)        # Show all rows
+    pd.set_option("display.max_columns", None)  
+    pd.set_option("display.width", None)           # Do not wrap to new lines
+    pd.set_option("display.max_colwidth", None)  
+
+    print(saved_operations)
+    print(new_operations)
 
     merged_df = new_operations.merge(saved_operations, how='left', indicator=True)
 
     operations_to_add = merged_df[merged_df['_merge'] == 'left_only'].drop(columns=['_merge'])
 
-    # print(operations_to_add)
+    print("Operations to add:")
+    print(operations_to_add)
+    print(operations_to_add.shape)
     return operations_to_add
 
 def date_to_int(operations : List[Operation]):

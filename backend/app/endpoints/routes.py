@@ -20,13 +20,13 @@ async def _get_status():
     return {"status": "OK"}
 
 @router.get(
-    path="/chart", 
+    path="/chart/{conditions}", 
     response_model=Data
     )
 @inject
 async def _calculate_trend(
     computing_service : Annotated[ComputingService, Depends(Provide[Container.compute_service])],
-    conditions : OperationConditions = Body(...)
+    conditions : Depends(OperationConditions)
 ):  
     try:
         data : Data = computing_service.calculate_trend(user_id=conditions.user_id)

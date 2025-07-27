@@ -31,7 +31,9 @@ def test_app_status(client):
     assert response.status_code == 200
     assert response.json() == {
         "status": "OK"
-    }    
+    }
+
+ 
     
 
 

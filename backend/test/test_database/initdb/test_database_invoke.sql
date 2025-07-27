@@ -66,21 +66,21 @@ INSERT INTO financial_operations (user_id, operation_date, category, description
 (1, '2025-05-21', 'Entertainment', 'Netflix subscription', 12.99, 'USD'),
 
 -- Jane
-(2, '2025-05-18', 'Utilities', 'Electricity bill', 65.75, 'USD'),
-(2, '2025-05-19', 'Dining', 'Dinner at Luigi''s', 45.00, 'USD'),
-(2, '2025-05-22', 'Health', 'Pharmacy purchase', 22.10, 'USD'),
+(2, '2025-05-18', 'Utilities', 'Electricity bill', -65.75, 'USD'),
+(2, '2025-05-19', 'Dining', 'Dinner at Luigi''s', -45.00, 'USD'),
+(2, '2025-05-22', 'Health', 'Pharmacy purchase', -22.10, 'USD'),
 
 -- Alice
-(3, '2025-05-17', 'Travel', 'Train ticket to Capital City', 30.00, 'USD'),
-(3, '2025-05-18', 'Groceries', 'Local farmer''s market', 28.50, 'USD'),
+(3, '2025-05-17', 'Travel', 'Train ticket to Capital City', -30.00, 'USD'),
+(3, '2025-05-18', 'Groceries', 'Local farmer''s market', -28.50, 'USD'),
 
 -- Bob
-(4, '2025-05-19', 'Education', 'Online course payment', 120.00, 'USD'),
-(4, '2025-05-20', 'Books', 'Bought books on Amazon', 35.99, 'USD'),
+(4, '2025-05-19', 'Education', 'Online course payment', -120.00, 'USD'),
+(4, '2025-05-20', 'Books', 'Bought books on Amazon', -35.99, 'USD'),
 
-(1, '2025-05-20', 'Groceries', 'Walmart grocery shopping', 75.20, 'USD'),
-(1, '2025-05-21', 'Transport', 'Uber to downtown', 15.00, 'USD'),
-(1, '2025-05-21', 'Entertainment', 'Netflix subscription', 12.99, 'USD'),
+(1, '2025-05-20', 'Groceries', 'Walmart grocery shopping', -75.20, 'USD'),
+(1, '2025-05-21', 'Transport', 'Uber to downtown', -15.00, 'USD'),
+(1, '2025-05-21', 'Entertainment', 'Netflix subscription', -12.99, 'USD'),
 
 -- Jane
 (1, '2025-05-18', 'Utilities', 'Electricity bill', 65.75, 'USD'),

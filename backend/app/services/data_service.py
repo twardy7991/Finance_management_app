@@ -27,17 +27,9 @@ class DataService:
                              ) -> pd.DataFrame:
         
         processed_data_file : pd.DataFrame = process_file(datafile)
-        print(f'asdfwGFAWG \n {processed_data_file}')
-            # 1. Aby wyświetlić wszystkie wiersze (bez ograniczeń na liczbę wierszy)
-        pd.set_option('display.max_rows', None)
-
-        # 2. Aby wyświetlić wszystkie kolumny (bez ograniczeń na liczbę kolumn)
-        pd.set_option('display.max_columns', None)
-        
         
         date_to = processed_data_file["#Data operacji"].iloc[0].date()
         date_from = processed_data_file["#Data operacji"].iloc[-1].date()
-        print(f"ASDAWFQWFQWFQ \n {date_from}, {date_to}")
         saved_operations = self.data_repository.get_user_operations(user_id, date_from, date_to)
         
         operations_to_add = get_unsaved_operations(saved_operations, processed_data_file)
