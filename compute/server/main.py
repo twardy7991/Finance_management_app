@@ -1,6 +1,9 @@
+### MAIN CLASS FOR COMPUTING SERVER ###
+
 from fastapi import FastAPI
-from routes import router
 from containers import Container
+
+from routes import router
 
 def create_app():
     container = Container()

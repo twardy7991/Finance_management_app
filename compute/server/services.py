@@ -3,6 +3,7 @@ from dependency_injector.wiring import inject, Provide
 from typing import List
 from exceptions import RegressionError
 
+### SERVICE CLASS FOR MODELS ###    
 class ModelService:
     
     def __init__(self,lr : Regression):

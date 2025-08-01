@@ -1,14 +1,15 @@
-""" class that handles the connection with the sql server """
+from typing import Generator
+from contextlib import contextmanager
 
-from sqlalchemy import create_engine, text, Connection
+from sqlalchemy import create_engine, text, Connection, orm
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import orm
-from contextlib import contextmanager
 from sqlalchemy.exc import OperationalError
 from fastapi import HTTPException
 
 Base = declarative_base()
+
+### CLASS THAT HANDLES CONNECTION WITH DATABASE ###
 
 class Database:
 
@@ -33,12 +34,12 @@ class Database:
         try:
             with self._engine.connect() as connection:
                 connection.execute(text("SELECT 1"))
-            print("✅ Database connection successful.")
+            print("Database connection successful.")
         except Exception as e:
-            print(f"❌ Failed to connect to the database: {e}")
+            print(f"Failed to connect to the database: {e}")
             raise ConnectionError("Database not available.") from e
     
-    ## used in testing ##
+    # used in testing 
     def get_session(self,  connection) -> Session:
         session_factory = orm.sessionmaker(
                 autocommit=False,
@@ -47,15 +48,14 @@ class Database:
             )
         return session_factory()
 
-    ## used in testing ##
+    # used in testing 
     def create_connection(self) -> Connection:
         return self._engine.connect()
         
-    ## function that yields a session ##
     @contextmanager
-    def session(self): #-> Generator[Session, None, None]: ## Iterator[Sesssion] is okay as generator is a subtype of Iterator
+    def session(self) -> Generator[Session, None, None]:
 
-        session: Session = self._session_factory()
+        session: orm.Session = self._session_factory()
         
         try:
             yield session

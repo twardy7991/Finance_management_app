@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
+from typing import List, Tuple
+
 from sklearn.linear_model import LinearRegression
 import numpy as np
-from typing import List, Tuple
+
+### ABSTRACT CLASS FOR MODELS ###
 
 class AbstractModel(ABC):
     
@@ -17,6 +20,7 @@ class AbstractModel(ABC):
     def fit(self):
         pass
 
+### LINEAR REGRESSION MODEL ###
 class Regression(AbstractModel):
 
     def fit(self) -> Tuple[List[List[float]], float, List[List[float]]]:

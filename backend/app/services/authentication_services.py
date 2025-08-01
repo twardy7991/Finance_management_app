@@ -1,8 +1,10 @@
+from typing import Tuple
+
 from app.auth.auth import AuthenticationTools
 from app.services.user_service import UserService
 from app.services.exceptions import UserNotFoundError, PasswordIncorrectError, TokenNotValidError
 
-from typing import Tuple
+### CLASS RESPONSIBLE FOR PROVIDING AUTHENTICATION SERVICES ###
 
 class AuthenticationService:
     

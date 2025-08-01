@@ -1,11 +1,13 @@
+from datetime import date
+from typing import List
+
 from app.services.utils.clients import ComputeClient
 from app.database.repositories import DataRepository
 from app.database.models import Operation
 from app.services.utils.data_processing import date_to_int
 from app.services.exceptions.exceptions import OperationsNotFoundError 
 
-from datetime import date
-from typing import List
+### CLASS RESPONSIBLE FOR COMPUTING SERVICES ###
 
 class ComputingService:
     
@@ -24,12 +26,8 @@ class ComputingService:
                                                 date_from=date_from,
                                                 date_to=date_to,
                                                 type="spendings")
-        
+
         if len(operations) < 1: 
             raise OperationsNotFoundError("Operations not found for selected period")
         
-        preprocessed_data = date_to_int(operations)
-        
-        data = self.compute_client.send_request(preprocessed_data)
-        
-        return data
+        return self.compute_client.send_request(date_to_int(operations)) 

@@ -1,7 +1,9 @@
 from dependency_injector import containers, providers
+
 from models import Regression
 import services
 
+### CLASS THAT CONSTRUCTS ALL DEPENDENCIES FOR COMPUTING SERVER ###
 class Container(containers.DeclarativeContainer):
     
     config = providers.Configuration()

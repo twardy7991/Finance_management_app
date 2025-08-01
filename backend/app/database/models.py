@@ -1,10 +1,13 @@
-from app.db import Base
-
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, VARCHAR, Text, DATE, NUMERIC
 from datetime import date
 from typing import List
 from decimal import Decimal
+
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey, VARCHAR, Text, DATE, NUMERIC
+
+from app.db import Base
+
+### CLASS MAPPING THE users TABLE ###
 
 class User(Base):
 
@@ -26,7 +29,9 @@ class User(Base):
                     telephone={self.telephone}
                     address={self.address}
             '''
-            
+
+### CLASS MAPPING THE credentials TABLE ###  
+
 class Credential(Base):
     
     __tablename__ = 'credentials'
@@ -41,6 +46,8 @@ class Credential(Base):
         return f'''Credential(credential_id={self.credential_id}, 
                     user_id={self.user_id}, 
                     username='{self.username}')"'''
+
+### CLASS MAPPING THE financial_operations TABLE ###
 
 class Operation(Base):
     

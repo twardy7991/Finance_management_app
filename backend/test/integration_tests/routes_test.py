@@ -35,18 +35,48 @@ def test_get_user_operations(client):
             "currency": "USD"
         }
     ]
+    
+def test_get_user_operations(client):
+    
+    response = client.post("/user/data", json={"user_id" : 2})
+        
+    assert response.status_code == 200
+    data = response.json()
+     
+    assert data == [
+        {
+            "operation_date": "2025-05-18",
+            "category": "Utilities",
+            "description": "Electricity bill",
+            "value": -65.75,
+            "currency": "USD"
+        },
+        {
+            "operation_date": "2025-05-19",
+            "category": "Dining",
+            "description": "Dinner at Luigi's",
+            "value": -45.00,
+            "currency": "USD"
+        },
+        {
+            "operation_date": "2025-05-22",
+            "category": "Health",
+            "description": "Pharmacy purchase",
+            "value": -22.10,
+            "currency": "USD"
+        }
+    ]
 
 def test_chart(client):
-    response = client.get("/chart", params={"user_id": 2})
+    response = client.get("/chart?user_id=2")
     
     assert response.status_code == 200
     data = response.json()
     
     assert data == {
-        "user_id": 2,
         "coef": 0.1,
         "intercept": 5.8,
-        "prefiction": [
+        "prediction": [
             -0.3,
             1.6,
             3.7

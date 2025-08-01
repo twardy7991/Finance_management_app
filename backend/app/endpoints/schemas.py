@@ -1,6 +1,9 @@
-from pydantic import BaseModel
+### MODELS FOR ROUTES ###
+
 from datetime import date
 from typing import List
+
+from pydantic import BaseModel
 
 class OperationConditions(BaseModel):
     user_id : int 

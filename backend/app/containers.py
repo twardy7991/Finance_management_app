@@ -1,3 +1,6 @@
+from fastapi.security import OAuth2PasswordBearer
+from dependency_injector import containers, providers
+
 from .db import Database
 from app.database.repositories import DataRepository, UserRepository, CredentialRepository
 from app.services.authentication_services import AuthenticationService
@@ -7,8 +10,7 @@ from app.services.data_service import DataService
 from app.auth.auth import AuthenticationTools 
 from app.services.utils.clients import ComputeClient
 
-from fastapi.security import OAuth2PasswordBearer
-from dependency_injector import containers, providers
+### CONTAINER CLASS THAT CONSTRUCTS ALL DEPENDENCIES ### 
 
 class Container(containers.DeclarativeContainer):
     
@@ -19,6 +21,21 @@ class Container(containers.DeclarativeContainer):
     
     db = providers.Singleton(Database, db_url=config.db.url) 
     
+    # utils/clients
+    auth_tools = providers.Factory(
+        AuthenticationTools,
+    )
+    
+    oauth2_bearer = providers.Factory(
+        oauth2_bearer=OAuth2PasswordBearer(tokenUrl='auth/token')
+    )
+    
+    compute_client = providers.Factory(
+        ComputeClient,
+        base_url = config.compute.url
+    )
+    
+    # repositories
     user_repository = providers.Factory(  
         UserRepository,
         session_factory=db.provided.session,
@@ -34,6 +51,7 @@ class Container(containers.DeclarativeContainer):
         session_facory=db.provided.session,
     )
     
+    # services
     user_service = providers.Factory(
         UserService,
         user_repository=user_repository,
@@ -49,23 +67,13 @@ class Container(containers.DeclarativeContainer):
         user_service=user_service,
     )
     
-    auth_tools = providers.Factory(
-        AuthenticationTools,
-    )
-    
-    oauth2_bearer = providers.Factory(
-        oauth2_bearer=OAuth2PasswordBearer(tokenUrl='auth/token')
-    )
-    
-    compute_client = providers.Factory(
-        ComputeClient,
-        base_url = config.compute.url
-    )
-    
     compute_service = providers.Factory(
         ComputingService,
         compute_client = compute_client,
         data_repository = data_repository
     )
     
+
+    
+
     

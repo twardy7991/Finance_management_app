@@ -1,14 +1,16 @@
+from typing import List, Annotated, Any
+
 from fastapi import APIRouter, Response, status, Body, Depends
 from pydantic import BaseModel
-from typing import List
-from models import AbstractModel, LinearRegression
-from services import ModelService
-from typing import Annotated, Any
-from containers import Container
 from dependency_injector.wiring import inject, Provide
+
+from services import ModelService
+from containers import Container
 from exceptions import RegressionError
 
-router = APIRouter()
+
+
+## models for routes
 
 class Coeff(BaseModel):
     coeff : List[int]
@@ -17,6 +19,9 @@ class Coeff(BaseModel):
     
 class Data(BaseModel):
     data : List[List]
+
+## routes configuration
+router = APIRouter()
 
 @router.get('/status')
 async def _status():

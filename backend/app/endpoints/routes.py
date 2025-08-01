@@ -1,3 +1,14 @@
+### FUNCTIONS THAT SET UP ROUTES ###
+
+from typing import List, Union, Annotated
+from datetime import date
+
+from fastapi import APIRouter, Depends, Response, status, Body, Form, UploadFile, File
+from fastapi.security.oauth2 import OAuth2PasswordRequestForm
+from dependency_injector.wiring import Provide, inject
+from jose import JWTError
+import json
+
 from app.endpoints.schemas import OperationConditions, OperationOut, CreateUserRequest, Token, Data
 from app.database.repositories import DataNotFound, UserNotProvidedError
 from app.services.compute_service import ComputingService
@@ -6,13 +17,6 @@ from app.services.authentication_services import AuthenticationService
 from app.containers import Container
 from app.services.exceptions import TokenNotValidError, OperationsNotFoundError
 
-from fastapi import APIRouter, Depends, Response, status, Body, Form, UploadFile, File
-from fastapi.security.oauth2 import OAuth2PasswordRequestForm
-from dependency_injector.wiring import Provide, inject
-from typing import List, Union, Annotated
-from jose import JWTError
-import json
-
 router = APIRouter()
 
 @router.get("/status")
@@ -20,33 +24,43 @@ async def _get_status():
     return {"status": "OK"}
 
 @router.get(
-    path="/chart/{conditions}", 
+    path="/chart", 
     response_model=Data
     )
 @inject
-async def _calculate_trend(
+async def _get_trend_data(
     computing_service : Annotated[ComputingService, Depends(Provide[Container.compute_service])],
-    conditions : Depends(OperationConditions)
-):  
+    user_id : int
+) -> Response:  
     try:
-        data : Data = computing_service.calculate_trend(user_id=conditions.user_id)
+        data : Data = computing_service.calculate_trend(user_id=user_id)
         return data
     except OperationsNotFoundError as e:
         return Response(status_code=status.HTTP_404_NOT_FOUND, content=str(e))
 
-@router.post(
+@router.get(
     path="/user/data",
     response_model=List[OperationOut]
     )
 @inject
 async def _get_user_finance_data(
     data_service: Annotated[DataService, Depends(Provide[Container.data_service])],
-    body_params: OperationConditions = Body(...),
+    user_id : int,
+    date_from : date | None = None,
+    date_to : date | None = None,
+    order : str = "asc",
+    operation_type : str | None = None,
+    group_by : str | None = None
 ) -> Union[List[OperationOut], Response]:
     try:
-        return data_service.get_user_operations(body_params.user_id, body_params.date_from, body_params.date_to)
-    except DataNotFound:
-        return Response(status_code=status.HTTP_404_NOT_FOUND)
+        return data_service.get_user_operations(user_id=user_id, 
+                                                date_from=date_from, 
+                                                date_to=date_to,
+                                                order=order,
+                                                operation_type=operation_type,
+                                                group_by=group_by)
+    except DataNotFound as e:
+        return Response(status_code=status.HTTP_404_NOT_FOUND, content=str(e))
 
 @router.post(
     path="/user/upload",

@@ -1,3 +1,5 @@
+### CLIENT RESPONSIBLE FOR CONNECTING TO COMPUTING SERVER ###
+
 import requests
 
 class ComputeClient:
@@ -7,11 +9,10 @@ class ComputeClient:
     
     def send_request(self, data):
 
-        payload = {
+        payload : dict = {
             "data" : data
         }
-        
-        print(payload)
+
         response = requests.post(f"{self.base_url}/models/lr", json=payload)
 
         response.raise_for_status()

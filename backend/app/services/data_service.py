@@ -1,9 +1,13 @@
-from app.database.repositories import DataRepository
 from datetime import date
 from typing import List, BinaryIO
-from app.database.models import Operation
+
 import pandas as pd
+
+from app.database.repositories import DataRepository
+from app.database.models import Operation
 from app.services.utils.data_processing import process_file, get_unsaved_operations
+
+### CLASS RESPONSIBLE FOR USER DATA SERVICES ###    
 
 class DataService:
     
@@ -13,18 +17,24 @@ class DataService:
     
     def get_user_operations(self, 
                             user_id: int, 
-                            data_from : date | None = None,
-                            data_to : date | None = None,
+                            date_from : date,
+                            date_to : date,
+                            order : str,
+                            operation_type : str,
+                            group_by : str
                             ) -> List[Operation]:
     
-        return self.data_repository.get_user_operations(user_id, 
-                                                   data_from, 
-                                                   data_to)
+        return self.data_repository.get_user_operations(user_id=user_id, 
+                                                   date_from=date_from, 
+                                                   date_to=date_to,
+                                                   order=order,
+                                                   operation_type=operation_type,
+                                                   group_by=group_by)
     
     def save_user_operations(self,
                              user_id : int,
                              datafile: BinaryIO
-                             ) -> pd.DataFrame:
+                             ):
         
         processed_data_file : pd.DataFrame = process_file(datafile)
         

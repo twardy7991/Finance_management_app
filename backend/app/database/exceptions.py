@@ -1,3 +1,5 @@
+### EXCEPTIONS FOR REPOSITORIES ###
+
 class NotFound(Exception):
     
     entity: str

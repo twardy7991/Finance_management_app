@@ -1,8 +1,13 @@
+### UTILS FUNCTIONS FOR REPOSITORIES ###
+
 from datetime import date
+from typing import List, Tuple
+
+from sqlalchemy import select, insert, Select
+import pandas as pd
+
 from app.database.models import Operation
 from app.database.exceptions import UserNotProvidedError
-from sqlalchemy import select, insert, Select
-from typing import Tuple
 
 def stmt_parser(user_id: int,
                 date_from : date | None = None,
@@ -44,10 +49,17 @@ def stmt_parser(user_id: int,
             case "currency" : group_by_condition = Operation.currency  
             
         stmt.group_by(group_by_condition)
-    
-    stmt = select(Operation).where(*where_conditions).order_by(order_condition)
-    
-    return stmt
 
-        
-    
+    return select(Operation).where(*where_conditions).order_by(order_condition)
+
+def dara_frame_to_operation_list(user_id : int, 
+                                 data_file : pd.DataFrame
+                                 ) -> List[Operation]:
+
+    return [Operation(user_id=user_id,
+                            operation_date=row["#Data operacji"],
+                            category=row["#Kategoria"],
+                            description=row["#Opis operacji"],
+                            value=row["Kwota"],
+                            currency=row["Waluta"]) 
+                            for _, row in data_file.iterrows()]

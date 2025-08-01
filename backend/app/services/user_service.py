@@ -2,6 +2,8 @@ from app.database.repositories import UserRepository, CredentialRepository
 
 from typing import Tuple
 
+### CLASS RESPONSIBLE THE USER SERVICES ###
+
 class UserService:
     
     def __init__(self, user_repository : UserRepository, credential_repository : CredentialRepository):

@@ -1,14 +1,14 @@
-from app.database.models import Operation, User, Credential
-from app.database.exceptions import UserNotProvidedError, UserNotSavedError, DataNotFound 
-from app.database.utils.utils import stmt_parser
+from datetime import date
+from typing import List, Tuple
+import logging
 
 from sqlalchemy.orm import Session, sessionmaker
-from typing import List, Tuple
-from datetime import date
 from sqlalchemy import select, insert
-import logging
 from pandas import DataFrame
 
+from app.database.models import Operation, User, Credential
+from app.database.exceptions import UserNotProvidedError, UserNotSavedError, DataNotFound 
+from app.database.utils.utils import stmt_parser, dara_frame_to_operation_list
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) 
@@ -16,6 +16,8 @@ handler = logging.StreamHandler()
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 handler.setFormatter(formatter)
 logger.addHandler(handler)
+
+### CLASS RESPONSIBLE FOR QUERYING USER OPERATIONS DATA ###
 
 class DataRepository:
 
@@ -28,11 +30,15 @@ class DataRepository:
                             date_from : date | None = None,
                             date_to : date | None = None,
                             order : str | None = "asc",
-                            type : str | None = None,
+                            operation_type : str | None = None,
                             group_by : str | None = None
                             ) -> List[Operation]:
         
-        stmt = stmt_parser(user_id, date_from, date_to, order, type, group_by)
+        stmt = stmt_parser(user_id=user_id, 
+                           date_from=date_from, 
+                           date_to=date_to, order=order, 
+                           operation_type=operation_type, 
+                           group_by=group_by)
         
         with self.session_factory() as session:
             
@@ -54,14 +60,7 @@ class DataRepository:
                        user_id : int
                        ) -> None:
         
-        operations = [Operation(
-                user_id=user_id,
-                operation_date=row["#Data operacji"],
-                category=row["#Kategoria"],
-                description=row["#Opis operacji"],
-                value=row["Kwota"],
-                currency=row["Waluta"]) 
-                for _, row in data_file.iterrows()]
+        operations : List[Operation] = dara_frame_to_operation_list(user_id=user_id, data_file=data_file)
         
         with self.session_factory() as session:
             
@@ -70,7 +69,9 @@ class DataRepository:
             session.bulk_save_objects(operations)
             
             session.commit()
-        
+
+### CLASS RESPONSIBLE FOR QUERYING USER SPECIFIC DATA ###
+     
 class UserRepository:
     
         def __init__(self, session_factory : sessionmaker[Session]) -> int:
@@ -102,7 +103,9 @@ class UserRepository:
                 session.commit()
             
             return pk
-                                    
+
+### CLASS RESPONSIBLE FOR QUERYING CREDENTIAL DATA ###  
+                             
 class CredentialRepository:
     
     def __init__(self, session_factory : sessionmaker[Session]):
