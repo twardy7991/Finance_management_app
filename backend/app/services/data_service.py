@@ -17,11 +17,11 @@ class DataService:
     
     def get_user_operations(self, 
                             user_id: int, 
-                            date_from : date,
-                            date_to : date,
-                            order : str,
-                            operation_type : str,
-                            group_by : str
+                            date_from : date | None = None,
+                            date_to : date | None = None,
+                            order : str = "asc",
+                            operation_type : str | None = None,
+                            group_by : str | None = None
                             ) -> List[Operation]:
     
         return self.data_repository.get_user_operations(user_id=user_id, 

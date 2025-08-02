@@ -25,7 +25,7 @@ class ComputingService:
         operations : List[Operation] = self.data_repository.get_user_operations(user_id=user_id,
                                                 date_from=date_from,
                                                 date_to=date_to,
-                                                type="spendings")
+                                                operation_type="spendings")
 
         if len(operations) < 1: 
             raise OperationsNotFoundError("Operations not found for selected period")

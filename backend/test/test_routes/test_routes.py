@@ -15,7 +15,7 @@ def test_get_user_operations(client):
     ]
 
     with app.container.data_service.override(service_mock):
-        response = client.post("/user/data", json={"user_id" : 2})
+        response = client.get("/user/data?user_id=2")
         
     assert response.status_code == 200
     data = response.json()
@@ -33,39 +33,32 @@ def test_app_status(client):
         "status": "OK"
     }
 
- 
-    
-
-
-
-    
-    
-
 # DATABASE CALL TESTS
 def test_specific_user_data_retrieval(client):
     
-    response = client.post("/user/data", json={"user_id" : 2})
+    response = client.get("/user/data?user_id=2")
+    
     assert response.status_code == 200
     assert response.json() == [
             {
                 "operation_date": "2025-05-18",
                 "category": "Utilities",
                 "description": "Electricity bill",
-                "value": 65.75,
+                "value": -65.75,
                 "currency": "USD"
             },
             {
                 "operation_date": "2025-05-19",
                 "category": "Dining",
                 "description": "Dinner at Luigi's",
-                "value": 45.0,
+                "value": -45.0,
                 "currency": "USD"
             },
             {
                 "operation_date": "2025-05-22",
                 "category": "Health",
                 "description": "Pharmacy purchase",
-                "value": 22.1,
+                "value": -22.1,
                 "currency": "USD"
             }
         ]

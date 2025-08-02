@@ -13,7 +13,7 @@ def stmt_parser(user_id: int,
                 date_from : date | None = None,
                 date_to : date | None = None,
                 order : str | None = "asc",
-                type : str | None = None,
+                operation_type : str | None = None,
                 group_by : str | None = None
                 )-> Select[Tuple[Operation]]:
     
@@ -30,8 +30,8 @@ def stmt_parser(user_id: int,
     if date_to is not None:
         where_conditions.append(Operation.operation_date <= date_to)
     
-    if type is not None:    
-        match type:
+    if operation_type is not None:    
+        match operation_type:
             case "spendings" : where_conditions.append(Operation.value < 0)
             case "earnings" : where_conditions.append(Operation.value > 0)
             

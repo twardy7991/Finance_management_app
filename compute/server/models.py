@@ -17,13 +17,14 @@ class AbstractModel(ABC):
         self.Y : np.ndarray = np.array(data)[:, 0].reshape(-1,1)
         
     @abstractmethod
-    def fit(self):
+    def fit(self) -> Tuple[List[List[float]], float, List[List[float]]]:
         pass
 
 ### LINEAR REGRESSION MODEL ###
+
 class Regression(AbstractModel):
 
-    def fit(self) -> Tuple[List[List[float]], float, List[List[float]]]:
+    def fit(self):
         
         lr = LinearRegression().fit(X=self.X, y=self.Y)
         

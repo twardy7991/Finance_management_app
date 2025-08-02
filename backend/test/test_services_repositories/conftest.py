@@ -40,7 +40,7 @@ def operations_to_save():
             operation_date=date(2025, 5, 18),
             category="Utilities",
             description="Electricity bill",
-            value=Decimal("65.75"),
+            value=Decimal("-65.75"),
             currency="USD"
         ),
         Operation(
@@ -49,7 +49,7 @@ def operations_to_save():
             operation_date=date(2025, 5, 19),
             category="Dining",
             description="Dinner at Luigi's",
-            value=Decimal("45.00"),
+            value=Decimal("-45.00"),
             currency="USD"
         ),
         Operation(
@@ -58,7 +58,7 @@ def operations_to_save():
             operation_date=date(2025, 5, 22),
             category="Health",
             description="Pharmacy purchase",
-            value=Decimal("22.10"),
+            value=Decimal("-22.10"),
             currency="USD"
         ),
     ]
@@ -73,7 +73,7 @@ def operations_in_database():
             operation_date=date(2025, 5, 18),
             category="Utilities",
             description="Electricity bill",
-            value=Decimal("65.75"),
+            value=Decimal("-65.75"),
             currency="USD"
         ),
         Operation(
@@ -82,7 +82,7 @@ def operations_in_database():
             operation_date=date(2025, 5, 19),
             category="Dining",
             description="Dinner at Luigi's",
-            value=Decimal("45.00"),
+            value=Decimal("-45.00"),
             currency="USD"
         ),
         Operation(
@@ -91,7 +91,7 @@ def operations_in_database():
             operation_date=date(2025, 5, 22),
             category="Health",
             description="Pharmacy purchase",
-            value=Decimal("22.10"),
+            value=Decimal("-22.10"),
             currency="USD"
         )
     ]

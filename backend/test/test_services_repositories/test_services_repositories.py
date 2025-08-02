@@ -1,11 +1,8 @@
 from app.database.repositories import DataRepository
 from sqlalchemy.orm import Session
 from app.services.data_service import DataService
-from app.database.models import Operation
-from datetime import date
-from decimal import Decimal
 
-from operator import itemgetter, attrgetter
+from operator import attrgetter
 from pathlib import Path
 
 filepath = Path(__file__).parent
@@ -18,8 +15,6 @@ def test_save_user_operations(session : Session, operations_to_save):
     with open(f"{filepath}/data/lista_operacji_small.csv", "r") as f: 
         print("plik", type(f))
         data_service.save_user_operations(user_id = 2, datafile=f)
-        
-    #print(data_repository.get_user_operations(user_id = 2))
     
     saved_operations = data_repository.get_user_operations(user_id = 2)
     
