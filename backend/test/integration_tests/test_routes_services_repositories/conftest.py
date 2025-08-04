@@ -13,9 +13,12 @@ from contextlib import contextmanager
 from app.main import create_app
 from app.db import Database
 
+## wont work because of session.commit() in repositories, every query uses different session,
+## and there is no way to rollback it without problems, i could try to get a common trnsaction and use 
+## savepoints, but it will additional overhead 
 class TestDatabase(Database):
     def __init__(self, db_url : str):
-        super().__init__(db_url)
+        super().__init__(db_url, flush = False)
     
     @contextmanager
     def session(self):
