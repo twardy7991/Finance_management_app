@@ -31,7 +31,7 @@ async def _get_status():
 async def _get_trend_data(
     computing_service : Annotated[ComputingService, Depends(Provide[Container.compute_service])],
     user_id : int
-) -> Response:  
+)-> Response | Union[List[List[int]], List[int]]:  
     try:
         data : Data = computing_service.calculate_trend(user_id=user_id)
         return data

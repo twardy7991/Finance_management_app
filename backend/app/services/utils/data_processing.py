@@ -86,7 +86,7 @@ def get_unsaved_operations(saved_operations : List[Operation], new_operations : 
 
     return operations_to_add
 
-def date_to_int(operations : List[Operation]):
+def date_to_int(operations : List[Operation]) -> List[List[float]]:
     
     # standard datetime value for one full day (amount of seconds)
     interval = 86400.0

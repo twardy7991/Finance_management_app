@@ -28,6 +28,8 @@ class Regression(AbstractModel):
         
         lr = LinearRegression().fit(X=self.X, y=self.Y)
         
-        return (lr.coef_.round(1).tolist(), 
-                lr.intercept_.round(1).tolist(), 
-                lr.predict(self.X).round(1).tolist())
+        prediction = lr.predict(self.X).round(1)
+        
+        return (lr.intercept_.round(1).tolist()[0], 
+                lr.coef_.round(1).tolist()[0], 
+                [p[0] for p in prediction.tolist()])

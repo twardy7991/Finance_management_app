@@ -7,7 +7,7 @@ from sqlalchemy import select, insert, Select
 import pandas as pd
 
 from app.database.models import Operation
-from app.database.exceptions import UserNotProvidedError
+from app.database.exceptions import UserNotProvidedError, ParameterError
 
 def stmt_parser(user_id: int,
                 date_from : date | None = None,
@@ -18,9 +18,6 @@ def stmt_parser(user_id: int,
                 )-> Select[Tuple[Operation]]:
     
     where_conditions = []
-        
-    if user_id is None:
-        raise UserNotProvidedError
     
     where_conditions.append(Operation.user_id == user_id)
     
@@ -34,25 +31,25 @@ def stmt_parser(user_id: int,
         match operation_type:
             case "spendings" : where_conditions.append(Operation.value < 0)
             case "earnings" : where_conditions.append(Operation.value > 0)
+            case _ : raise ParameterError("wrong operation_type value")
             
     stmt = select(Operation).where(*where_conditions)
-        
-    if order is "desc":
-        order_condition = Operation.operation_date.desc()
-    else:
-        order_condition = Operation.operation_date.asc()
+    
+    match order:
+        case "desc" : stmt = stmt.order_by(Operation.operation_date.desc())
+        case "asc" : stmt = stmt.order_by(Operation.operation_date.asc())
+        case _ : raise ParameterError("wrong order value")
     
     if group_by is not None:
         match group_by:
-            case "date" : group_by_condition = Operation.operation_date
-            case "category" : group_by_condition = Operation.category 
-            case "currency" : group_by_condition = Operation.currency  
-            
-        stmt.group_by(group_by_condition)
+            case "date" : stmt = stmt.group_by(Operation.operation_date)
+            case "category" : stmt = stmt.group_by(Operation.category)
+            case "currency" : stmt = stmt.group_by(Operation.currency)
+            case _ : raise ParameterError("wrong group_by value")
 
-    return select(Operation).where(*where_conditions).order_by(order_condition)
+    return stmt
 
-def dara_frame_to_operation_list(user_id : int, 
+def data_frame_to_operation_list(user_id : int, 
                                  data_file : pd.DataFrame
                                  ) -> List[Operation]:
 

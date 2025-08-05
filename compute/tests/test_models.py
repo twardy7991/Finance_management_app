@@ -11,9 +11,9 @@ def test_fit_lr(linear_model : Regression):
     
     linear_model.add_data(data=data)
     
-    assert linear_model.fit() == ([[1.0]], 
-                                  [-1.0], 
-                                  [[0.0],[1.0],[2.0],[3.0]])
+    assert linear_model.fit() == (1.0, 
+                                  [1.0], 
+                                  [1.0,2.0,3.0,4.0])
     
 
     

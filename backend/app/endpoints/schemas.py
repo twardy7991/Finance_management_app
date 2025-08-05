@@ -29,7 +29,7 @@ class Token(BaseModel):
     token_type: str
     
 class Data(BaseModel):
-    coef : float
     intercept : float
+    coeff : List[float] 
     prediction : List[float]
         

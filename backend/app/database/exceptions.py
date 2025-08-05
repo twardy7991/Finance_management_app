@@ -18,3 +18,7 @@ class UserNotProvidedError(Exception):
 class UserNotSavedError(Exception):
     def __init__(self):
         super().__init__("user was not saved to the database")
+
+class ParameterError(Exception):
+    def __init__(self, message : str):
+        super().__init__(message)

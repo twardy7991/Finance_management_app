@@ -14,12 +14,12 @@ class ModelService:
         self.lr.add_data(data=data)
         
         try:
-            coef, intercept, prediction = self.lr.fit()
+            intercept, coef, prediction = self.lr.fit()
         
             response = {
-                "coef" : coef[0][0],
-                "intercept" : intercept[0],
-                "prediction" : [p[0] for p in prediction]
+                "intercept" : intercept,
+                "coeff" : coef,
+                "prediction" : prediction
             }
             
             return response

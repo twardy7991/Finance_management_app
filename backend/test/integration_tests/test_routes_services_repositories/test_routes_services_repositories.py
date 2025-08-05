@@ -34,20 +34,20 @@ def test_get_user_operations(client):
     ]
     
 def test_chart(client):
+    
     response = client.get("/chart?user_id=2")
     
     assert response.status_code == 200
     data = response.json()
     
     assert data == {
-        "coef": 0.1,
+        "coeff": [0.1],
         "intercept": 5.8,
         "prediction": [
             -0.3,
             1.6,
             3.7
         ]
-        
     }
 
 def test_app_status(client):

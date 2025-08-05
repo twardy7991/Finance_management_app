@@ -12,7 +12,7 @@ from app.db import Base
 class User(Base):
 
     __tablename__ = 'users'
-    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] =  mapped_column(VARCHAR(100), nullable=False)
     surname: Mapped[str] = mapped_column(VARCHAR(100), nullable=False)
     telephone: Mapped[str] = mapped_column(VARCHAR(20), nullable=True)
@@ -20,6 +20,16 @@ class User(Base):
     
     credential: Mapped['Credential'] = relationship(back_populates="user")
     operations: Mapped[List['Operation']] = relationship(back_populates="user")
+    
+    # needed for testing
+    def is_equal(self, other) -> bool:
+        return (
+            self.user_id == other.user_id and
+            self.name == other.name and 
+            self.surname == other.surname and 
+            self.telephone == other.telephone and 
+            self.address == other.address
+        )    
         
     def __repr__(self):
         
@@ -29,14 +39,14 @@ class User(Base):
                     telephone={self.telephone}
                     address={self.address}
             '''
-
+    
 ### CLASS MAPPING THE credentials TABLE ###  
 
 class Credential(Base):
     
     __tablename__ = 'credentials'
     credential_id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.user_id'))
     username: Mapped[str] = mapped_column(VARCHAR(50), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(VARCHAR(50), unique=True, nullable=False)
     
@@ -53,7 +63,7 @@ class Operation(Base):
     
     __tablename__ = 'financial_operations'
     operation_id: Mapped[int] = mapped_column(primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.user_id'))
     operation_date: Mapped[date] = mapped_column(DATE, nullable=False)
     category: Mapped[str] = mapped_column(VARCHAR(50), nullable=True)
     description: Mapped[str] = mapped_column(Text(), nullable=True)

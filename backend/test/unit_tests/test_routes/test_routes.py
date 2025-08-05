@@ -1,4 +1,4 @@
-from app.main import app
+from app.main import create_app
 from app.services.data_service import DataService
 from app.database.models import Operation
 from unittest import mock
@@ -13,6 +13,7 @@ def test_get_user_operations(client):
         Operation(operation_id=14, user_id=1, operation_date="2025-06-19", category="education", description="Online course payment", value=36.20, currency="PLN")
     ]
 
+    app = create_app()
     with app.container.data_service.override(service_mock):
         response = client.get("/user/data?user_id=2")
         

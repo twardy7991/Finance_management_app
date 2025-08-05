@@ -14,9 +14,9 @@ def test_send_request():
     data = [[1.0, 11.10],[2, 51.09],[5, 20.0],[4.0, 310.99]] 
             
     
-    assert compute_client.send_request(data=data) == [[[0.0]],
-                                                      [2.6],
-                                                      [[2.6],[2.8],[2.6],[4.0]]]
+    assert compute_client.send_request(data=data) == {"intercept" : 2.6,
+                                                      "coeff" : [0.0],
+                                                      "prediction" : [2.6,2.8,2.6,4.0]}
 
 
     

@@ -13,11 +13,13 @@ Base = declarative_base()
 
 class Database:
 
-    def __init__(self, db_url : str):
+    def __init__(self, db_url : str, flush : bool = True):
         print("DB URL received:", db_url)
         self._engine = create_engine(url = db_url, echo=True) 
 
         print("Connecting to DB...")
+        if not flush:
+            print("Test instance")
         print(self._engine.url)
 
         self.Base = declarative_base()
@@ -25,7 +27,7 @@ class Database:
         self._session_factory = orm.scoped_session(
             orm.sessionmaker(
                 autocommit=False,
-                autoflush=True,
+                autoflush=flush,
                 bind=self._engine,
             ),
         )
