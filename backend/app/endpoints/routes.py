@@ -9,13 +9,14 @@ from dependency_injector.wiring import Provide, inject
 from jose import JWTError
 import json
 
-from app.endpoints.schemas import OperationConditions, OperationOut, CreateUserRequest, Token, Data
+from app.endpoints.schemes import OperationConditions, OperationOut, CreateUserRequest, Token, Data, Credentials
 from app.database.repositories import DataNotFound, UserNotProvidedError
 from app.services.compute_service import ComputingService
 from app.services.data_service import DataService
-from app.services.authentication_services import AuthenticationService
+from app.services.user_service import UserService
+from app.services.authentication_service import AuthenticationService
 from app.containers import Container
-from app.services.exceptions import TokenNotValidError, OperationsNotFoundError
+from app.services.exceptions import TokenNotValidError, OperationsNotFoundError, PasswordIncorrectError, UsernameIncorrectError
 
 router = APIRouter()
 
@@ -81,17 +82,66 @@ async def _post_user_finance_data(
             media_type="application/json"
             )
     
-    # @inject
-    # async def _register_user(
-    #     self,
-    #     user_request: CreateUserRequest = Body(...),
-    #     auth_service : AuthenticationService = Depends(Provide[Container.auth_service])
-    # ) -> Response:
-    #     try:
-    #         auth_service.register_user(username=user_request.username, password=user_request.password)
-    #     except Exception:
-    #         return NotImplementedError 
+@router.post(
+        path="/register"
+)
+@inject
+async def _register_user(
+    user_request: CreateUserRequest = Body(...),
+    user_service : UserService = Depends(Provide[Container.user_service])
+) -> Response:
+    # try:
+        user_service.register_user(username=user_request.username, 
+                                   password=user_request.password,
+                                   name=user_request.name,
+                                   surname=user_request.surname,
+                                   telephone=user_request.telephone,
+                                   address=user_request.address)
+        return Response(status_code=status.HTTP_200_OK)
+    # except Exception:
+    #     return NotImplementedError 
 
+@router.get(
+    path="/user/profile"
+)
+@inject
+async def _get_user_profile_data(
+    user_id : int,
+    user_service : UserService = Depends(Provide[Container.user_service])
+):
+    try:
+        return user_service.get_user(user_id=user_id)
+    except Exception:
+        raise NotImplementedError 
+
+@router.post(
+    "/login"
+)
+@inject
+async def _login(
+    credentials : Credentials = Body(...),
+    authentication_service : AuthenticationService = Depends(Provide[Container.auth_service])
+):
+    try:
+        authentication_service.login_user(username=credentials.username,
+                                          password=credentials.password)
+        return Response(
+            content="login successful",
+            status_code=status.HTTP_200_OK
+        )
+    except PasswordIncorrectError as e:
+        return Response(
+            content=str(e),
+            status_code=status.HTTP_401_UNAUTHORIZED
+        )
+    except UsernameIncorrectError as e:
+        return Response(
+            content=str(e),
+            status_code=status.HTTP_401_UNAUTHORIZED
+        )
+    except Exception:
+        raise NotImplementedError
+        
     # # @inject
     # async def _login_for_token(
     #     self,
@@ -122,11 +172,7 @@ async def _post_user_finance_data(
     #     except JWTError:
     #         return Response(status_code=status.HTTP_401_UNAUTHORIZED)
       
-    #     self.router.add_api_route(
-    #         path="/user/register",
-    #         endpoint=self._register_user,
-    #         methods=["POST"]
-    #     )
+
         
         # self.router.add_api_route(
         #     path="/user/token",

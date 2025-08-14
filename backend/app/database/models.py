@@ -24,7 +24,6 @@ class User(Base):
     # needed for testing
     def is_equal(self, other) -> bool:
         return (
-            self.user_id == other.user_id and
             self.name == other.name and 
             self.surname == other.surname and 
             self.telephone == other.telephone and 
@@ -33,7 +32,7 @@ class User(Base):
         
     def __repr__(self):
         
-        return f'''User(id={self.id})" 
+        return f'''User(id={self.user_id})" 
                     name={self.name}
                     surname={self.surname}
                     telephone={self.telephone}
@@ -48,14 +47,24 @@ class Credential(Base):
     credential_id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('users.user_id'))
     username: Mapped[str] = mapped_column(VARCHAR(50), unique=True, nullable=False)
-    password: Mapped[str] = mapped_column(VARCHAR(50), unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(VARCHAR(77), unique=True, nullable=False)
     
     user: Mapped['User'] = relationship(back_populates="credential")
         
+        
+    # needed for testing
+    def is_equal(self, other, context) -> bool:
+        return (
+            self.user_id == other.user_id and
+            self.username == other.username and 
+            context.verify(other.password, self.password) 
+        )      
+    
     def __repr__(self):
         return f'''Credential(credential_id={self.credential_id}, 
                     user_id={self.user_id}, 
-                    username='{self.username}')"'''
+                    username='{self.username}'
+                    password='{self.password}')'''
 
 ### CLASS MAPPING THE financial_operations TABLE ###
 

@@ -3,6 +3,10 @@ class AuthError(Exception): pass
 class PasswordIncorrectError(AuthError):
     def __init__(self):
         super().__init__("password is incorrect")
+
+class UsernameIncorrectError(AuthError):
+    def __init__(self):
+        super().__init__("username is incorrect")
     
 class TokenNotValidError(AuthError):
     

@@ -1,0 +1,4 @@
+name: main test merge
+
+on:
+  merge:

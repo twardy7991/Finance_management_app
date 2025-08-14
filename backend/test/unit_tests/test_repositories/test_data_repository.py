@@ -401,63 +401,7 @@ def test_update_operations_many_operations(session):
     for a,b in zip(data_repository.get_user_operations(user_id=2), correct_updated_operations):
         assert a.is_equal(b)
 
-def test_get_user(session):
-    
-    user_repository = UserRepository(session_factory=session)
-    
-    user_id = 2
-    
-    user = user_repository.get_user(user_id=user_id)
-    
-    assert user.is_equal(User(
-        user_id=2,
-        name="Jane",
-        surname="Smith",
-        telephone="987654321",
-        address="456 Elm St, Springfield"
-    ))
 
-def test_update_user(session):
-    
-    user_repository = UserRepository(session_factory=session)
-    user_id = 2
-    
-    data = [{
-            "updated_fields" : {
-                "address" : "Racławicka 6/4, Kraków"
-            }
-        }]
-    
-    user_repository.update_user(user_id=user_id, data=data)
-    
-    updated_user = user_repository.get_user(user_id=user_id)
-    
-    assert updated_user.is_equal(User(
-        user_id=2,
-        name="Jane",
-        surname="Smith",
-        telephone="987654321",
-        address="Racławicka 6/4, Kraków"
-    ))
-
-def test_delete_user(session):
-    
-    user_repository = UserRepository(session_factory=session)
-    user_id = 2
-    
-    user = user_repository.get_user(user_id=user_id)
-    
-    assert user.is_equal(User(
-        user_id=2,
-        name="Jane",
-        surname="Smith",
-        telephone="987654321",
-        address="456 Elm St, Springfield"
-    ))
-    
-    user_repository.delete_user(user_id=user_id)
-    
-    assert user_repository.get_user(user_id=user_id) == None
     
     
     

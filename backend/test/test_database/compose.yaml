@@ -2,9 +2,7 @@ services:
 
   db:
     image: postgres:16.1
-    pre_stop:
       
-
     ports: 
       - "5422:5432"
 

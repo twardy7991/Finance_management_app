@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 class OperationConditions(BaseModel):
     user_id : int 
-    date_from: date | None = None
+    date_from : date | None = None
     date_to: date | None = None
 
 class OperationOut(BaseModel):
@@ -21,8 +21,16 @@ class OperationOut(BaseModel):
         orm_mode = True
         
 class CreateUserRequest(BaseModel):
-    username: str
-    password: str
+    username : str
+    password : str
+    name : str
+    surname: str
+    telephone : str
+    address : str
+    
+class Credentials(BaseModel):
+    username : str
+    password : str
     
 class Token(BaseModel):
     access_token: str

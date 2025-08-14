@@ -22,7 +22,7 @@ CREATE TABLE credentials (
     credential_id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     username VARCHAR(50) UNIQUE NOT NULL,
-    password VARCHAR(50) UNIQUE NOT NULL
+    password VARCHAR(77) UNIQUE NOT NULL
 );
 
 CREATE TABLE financial_operations (

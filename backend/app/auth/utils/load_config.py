@@ -5,3 +5,4 @@ load_dotenv(dotenv_path=".env")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM_TYPE")
+TOKEN_LEN = os.getenv("TOKEN_LEN")
