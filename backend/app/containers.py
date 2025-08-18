@@ -2,12 +2,11 @@ from fastapi.security import OAuth2PasswordBearer
 from dependency_injector import containers, providers
 
 from .db import Database
-from app.database.repositories import DataRepository, UserRepository, CredentialRepository
 from app.services.authentication_service import AuthenticationService
 from app.services.compute_service import ComputingService
 from app.services.user_service import UserService
 from app.services.data_service import DataService
-from app.services.utils.unit import UnitOfWorkRegistration
+from app.services.utils.unit import UnitOfWorkRegistration, UnitOfWorkCredential, UnitOfWorkOperation, UnitOfWorkUser
 from app.auth.auth import AuthenticationTools 
 from app.services.utils.clients import ComputeClient
 
@@ -35,51 +34,51 @@ class Container(containers.DeclarativeContainer):
         ComputeClient,
         base_url = config.compute.url
     )
-    
+        
+    # uow
     uow_registration = providers.Factory(
         UnitOfWorkRegistration,
-        session_factory=db.provided.session
+        session_factory=db.provided.session_factory
     )
     
-    # repositories
-    user_repository = providers.Factory(  
-        UserRepository,
-        session_factory=db.provided.session,
-        )
-    
-    data_repository = providers.Factory(
-        DataRepository,
-        session_factory=db.provided.session,
+    user_uow = providers.Factory(
+        UnitOfWorkUser,
+        session_factory=db.provided.session_factory,
     )
     
-    credential_repository = providers.Factory(
-        CredentialRepository,
-        session_factory=db.provided.session,
+    credential_uow = providers.Factory(
+        UnitOfWorkCredential,
+        session_factory=db.provided.session_factory,
+    )
+    
+    operation_uow = providers.Factory(
+        UnitOfWorkOperation,
+        session_factory=db.provided.session_factory,
     )
     
     # services
     auth_service = providers.Factory(
         AuthenticationService,
-        credential_repository=credential_repository,
-        auth_tools=auth_tools
+        auth_tools=auth_tools,
+        credential_uow=credential_uow
     )
     
     user_service = providers.Factory(
         UserService,
-        user_repository=user_repository,
         uow_registration=uow_registration,
+        user_uow=user_uow,
         auth_tools=auth_tools
     ) 
     
     data_service = providers.Factory(
         DataService,
-        data_repository=data_repository,
+        operation_uow=operation_uow
     )
     
     compute_service = providers.Factory(
         ComputingService,
         compute_client = compute_client,
-        data_repository = data_repository
+        operation_uow=operation_uow
     )
     
 

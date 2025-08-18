@@ -1,24 +1,18 @@
 from typing import Tuple
 
 from app.auth.auth import AuthenticationTools
-from app.services.exceptions import UserNotFoundError, PasswordIncorrectError, UsernameIncorrectError
-from app.database.repositories import CredentialRepository
+from app.services.exceptions import PasswordIncorrectError, UsernameIncorrectError
 from app.database.models import Credential
+from .utils.unit import UnitOfWorkCredential
 ### CLASS RESPONSIBLE FOR PROVIDING AUTHENTICATION SERVICES ###
 
 class AuthenticationService:
     
-    def __init__(self, credential_repository : CredentialRepository, auth_tools : AuthenticationTools):    
+    def __init__(self, credential_uow : UnitOfWorkCredential, auth_tools : AuthenticationTools):    
         
-        self.credential_repository = credential_repository
+        self.credential_uow = credential_uow
         self.auth_tools = auth_tools
-        
-    def save_credentials(self, user_id, username, password):
-        
-        self.credential_repository.save_credentials(user_id=user_id,
-                                        username=username, 
-                                        hashed_password=self.auth_tools.hash(password))
-        
+    
     def login_user(self, 
                    username : str, 
                    password : str
@@ -44,5 +38,6 @@ class AuthenticationService:
         # return username, user_id
     
     def get_credential(self, username : str) -> Credential:
-        return self.credential_repository.get_credentials(username=username)
+        with self.credential_uow as uow:
+            return uow.repository.get_credentials(username=username)
         

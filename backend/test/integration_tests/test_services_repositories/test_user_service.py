@@ -4,6 +4,7 @@ from app.services.user_service import UserService
 from app.services.authentication_service import AuthenticationService
 from app.database.models import User, Credential
 
+
 def test_get_user(user_service :  UserService):
     user_id = 2
     

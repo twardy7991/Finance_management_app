@@ -4,8 +4,6 @@ from contextlib import contextmanager
 from sqlalchemy import create_engine, text, Connection, orm
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.exc import OperationalError
-from fastapi import HTTPException
 
 Base = declarative_base()
 
@@ -27,7 +25,7 @@ class Database:
         self._session_factory = orm.scoped_session(
             orm.sessionmaker(
                 autocommit=False,
-                autoflush=flush,
+                autoflush=False,
                 bind=self._engine,
             ),
         )
@@ -54,19 +52,15 @@ class Database:
     def create_connection(self) -> Connection:
         return self._engine.connect()
         
-    @contextmanager
-    def session(self) -> Generator[Session, None, None]:
-
-        session: orm.Session = self._session_factory()
-        
-        try:
-            yield session
-        except Exception as e:
-            session.rollback()
-            print(f"Wystąpił błąd {e}")
-        except OperationalError:
-            raise HTTPException(status_code=503, detail="Database unavailable")
-        finally:
-            session.close()
+    def session_factory(self) -> Session:
+        # try:
+            return self._session_factory
+        # except Exception as e:
+        #     session.rollback()
+        #     print(f"Wystąpił błąd {e}")
+        # except OperationalError:
+        #     raise HTTPException(status_code=503, detail="Database unavailable")
+        # finally:
+        #     session.close()
             
         

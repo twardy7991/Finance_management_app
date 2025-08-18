@@ -9,16 +9,13 @@ filepath = Path(__file__).parent
 
 ## probably a wrong contructed tests, for further review ##
 
-def test_save_user_operations(session : Session, operations_to_save):
-        
-    data_repository = DataRepository(session)
-    data_service = DataService(data_repository)
+def test_save_user_operations(operations_to_save, data_service : DataService):
     
     with open(f"{filepath}/data/lista_operacji_small.csv", "r") as f: 
         print("plik", type(f))
         data_service.save_user_operations(user_id = 2, datafile=f)
     
-    saved_operations = data_repository.get_user_operations(user_id = 2)
+    saved_operations = data_service.get_user_operations(user_id = 2)
     
     assert len(saved_operations) == len(operations_to_save)
     
@@ -32,10 +29,7 @@ def test_save_user_operations(session : Session, operations_to_save):
     for saved, expected in zip(saved_operations, operations_to_save):
         assert saved.is_equal(expected)
 
-def test_get_user_operations(session, operations_in_database):
-    
-    data_repository = DataRepository(session)
-    data_service = DataService(data_repository)
+def test_get_user_operations(data_service : DataService, operations_in_database):
     
     for saved, expected in zip(data_service.get_user_operations(user_id=2), operations_in_database):
         assert saved.is_equal(expected)

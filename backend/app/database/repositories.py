@@ -23,15 +23,10 @@ logger.addHandler(handler)
  
 class Repository(abc.ABC):
     
-    def __init__(self, session_factory : sessionmaker[Session], session=None):
+    def __init__(self, session : Session):
         
         self._session : Session = session
-        self._session_factory : Session = session_factory
 
-    @property
-    def session(self):
-        return self._session or self._session_factory() 
-    
 ### CLASS RESPONSIBLE FOR QUERYING USER OPERATIONS DATA ###
 
 class DataRepository(Repository):
@@ -45,15 +40,13 @@ class DataRepository(Repository):
                             group_by : str | None = None
                             ) -> List[Operation]:
         
-        with self.session as session:
-        
             stmt : Select = stmt_parser(user_id=user_id, 
                             date_from=date_from, 
                             date_to=date_to, order=order, 
                             operation_type=operation_type, 
                             group_by=group_by)
         
-            result = list(session.scalars(stmt))
+            result = list(self._session.scalars(stmt))
             
             values : List[Operation] = list(result)
 
@@ -70,12 +63,8 @@ class DataRepository(Repository):
                        ) -> None:
         
         operations : List[Operation] = data_frame_to_operation_list(user_id=user_id, data_file=data_file)
-            
-        with self.session as session:
         
-            session.bulk_save_objects(operations)
-            
-            session.commit()
+        self._session.bulk_save_objects(operations)
         
     def update_operations(self, 
                           user_id : int, 
@@ -88,15 +77,11 @@ class DataRepository(Repository):
                 **o["updated_fields"]
             } 
             for o in operations]
-        
-        with self.session as session:
             
-            session.execute(
-                update(Operation), 
-                update_params
-                )
-
-            session.commit()
+        self._session.execute(
+            update(Operation), 
+            update_params
+            )
 
     def delete_operations(self, user_id, operations : List[Operation] | List[int]):
         
@@ -105,31 +90,24 @@ class DataRepository(Repository):
         
         stmt : Delete = delete(Operation).where(Operation.operation_id.in_(tuple(operations)), Operation.user_id == user_id)
         
-        with self.session as session:
-            
-            session.execute(stmt)
-            
-            session.commit()
-            
+        self._session.execute(stmt)
 
 ### CLASS RESPONSIBLE FOR QUERYING USER SPECIFIC DATA ###
      
 class UserRepository(Repository):
         
         def get_user(self, user_id : int) -> User:
+
+            stmt = select(User).where(User.user_id == user_id)
             
-            with self.session as session:
-                
-                stmt = select(User).where(User.user_id == user_id)
-                
-                result = list(session.scalars(stmt))
-                
-                logger.debug(f"Fetched user info for user_id={user_id} : {result}")
-                
-                if result:
-                    return result[0]
-                
-                return None
+            result = list(self._session.scalars(stmt))
+            
+            logger.debug(f"Fetched user info for user_id={user_id} : {result}")
+            
+            if result:
+                return result[0]
+            
+            return None
 
         def save_user(self ,
                 name : str, 
@@ -139,19 +117,15 @@ class UserRepository(Repository):
                 ) -> int:
             
             stmt : Insert = insert(User).values(name=name, surname=surname, telephone=telephone, address=address)
-                
-            with self.session as session:
-                
-                result = session.execute(stmt)
-                
-                pk : int = result.inserted_primary_key[0]
-                
-                if pk is None:
-                    raise UserNotSavedError
-                
-                #session.commit()
-                
-                return pk
+
+            result = self._session.execute(stmt)
+            
+            pk : int = result.inserted_primary_key[0]
+            
+            if pk is None:
+                raise UserNotSavedError
+            
+            return pk
         
         def update_user(self, user_id, data):
                 
@@ -159,14 +133,13 @@ class UserRepository(Repository):
                     "user_id" : user_id,
                     **data[0]["updated_fields"]
                     }]
-            with self.session as session:
-                
-                session.execute(
-                    update(User), 
-                    update_params
-                )
 
-                session.commit()
+            self._session.execute(
+                update(User), 
+                update_params
+            )
+
+            self._session.commit()
         
         def delete_user(self, user_id : int):
                 
@@ -175,11 +148,7 @@ class UserRepository(Repository):
             
             stmt : Delete = delete(User).where(User.user_id == user_id)
             
-            with self.session as session:
-                
-                session.execute(stmt)
-                
-                session.commit()
+            self._session.execute(stmt)
             
 ### CLASS RESPONSIBLE FOR QUERYING CREDENTIAL DATA ###  
                              
@@ -192,14 +161,10 @@ class CredentialRepository(Repository):
                          ) -> None:
         
         stmt = insert(Credential).values(user_id=user_id, username=username, password=hashed_password)
-            
-        with self.session as session:
-            
-            session.execute(stmt)
-
-            #session.commit()
-            
-            logger.debug(f"saved credentials for user {user_id}")
+        
+        self._session.execute(stmt)
+        
+        logger.debug(f"saved credentials for user {user_id}")
                 
             
     def get_credentials(self, 
@@ -208,10 +173,8 @@ class CredentialRepository(Repository):
         
         stmt = select(Credential).where(Credential.username==username)
         
-        with self.session as session:
-            
-            result : Credential = session.scalar(stmt)
-            
-            logger.debug(f"Fetched credentials for user_id={username} : {result}")
+        result : Credential = self._session.scalar(stmt)
+        
+        logger.debug(f"Fetched credentials for user_id={username} : {result}")
 
-            return result
+        return result

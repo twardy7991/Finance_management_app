@@ -1,14 +1,14 @@
 import pytest
-from app.database.repositories import DataRepository, UserRepository
+from app.database.repositories import DataRepository
 from app.database.models import Operation, User
 from datetime import date
 from decimal import Decimal
 from app.database.exceptions import ParameterError
 from typing import List
 
-def test_get_user_operations(session):
+
     
-    data_repository = DataRepository(session_factory=session)
+def test_get_user_operations(data_repository : DataRepository):
     
     # with pytest.raises(TypeError):
         
@@ -30,6 +30,7 @@ def test_get_user_operations(session):
     with pytest.raises(ParameterError):
         data_repository.get_user_operations(user_id=2, group_by="user_id")
     
+def test_get_user_operations_user_id(data_repository : DataRepository):
     # user_id
     operation_list = [
         Operation(
@@ -63,7 +64,8 @@ def test_get_user_operations(session):
     
     for a, b in zip(data_repository.get_user_operations(user_id=2), operation_list):
         assert a.is_equal(b) 
-    
+
+def test_get_user_operations_date_from(data_repository : DataRepository):
     # date_from
     operation_list = [
         Operation(
@@ -89,7 +91,7 @@ def test_get_user_operations(session):
     for a,b in zip(data_repository.get_user_operations(user_id=2, date_from=date(2025, 5, 19)), operation_list):
         assert a.is_equal(b)
 
-    # date_to
+def test_get_user_operations_date_to(data_repository : DataRepository):
     operation_list = [
          Operation(
             operation_id=4,
@@ -114,7 +116,9 @@ def test_get_user_operations(session):
     for a,b in zip(data_repository.get_user_operations(user_id=2, date_to=date(2025, 5, 19)), operation_list):
         assert a.is_equal(b)
     
-    # date_from, date_to
+    
+def test_get_user_operations_date_from_date_to(data_repository : DataRepository):
+    
     operation_list = [
         Operation(
             operation_id=5,
@@ -164,7 +168,7 @@ def test_get_user_operations(session):
     for a,b in zip(data_repository.get_user_operations(user_id=2, order="desc"), operation_list):
         assert a.is_equal(b)
     
-    # operation_type = spendings
+def test_get_user_operations_operation_type_spendings(data_repository : DataRepository):
     operation_list = [
         Operation(
             operation_id=4,
@@ -198,16 +202,12 @@ def test_get_user_operations(session):
     for a,b in zip(data_repository.get_user_operations(user_id=2, operation_type="spendings"), operation_list):
         assert a.is_equal(b)
         
-    # operation_type = earnings
+def test_get_user_operations_operation_type_earnings(data_repository : DataRepository):
     operation_list = []
     
     assert data_repository.get_user_operations(user_id=2, operation_type="earnings") == operation_list
     
-    
-
-def test_delete_operations_using_objects(session):
-    
-    data_repository = DataRepository(session_factory=session)
+def test_delete_operations_using_objects(data_repository : DataRepository):
     
     user_id = 2
     
@@ -246,9 +246,7 @@ def test_delete_operations_using_objects(session):
             currency="USD"
         ))
     
-def test_delete_operations_using_ids(session):
-    
-    data_repository = DataRepository(session_factory=session)
+def test_delete_operations_using_ids(data_repository : DataRepository):
     
     user_id = 2
     
@@ -268,9 +266,7 @@ def test_delete_operations_using_ids(session):
             currency="USD"
         ))
     
-def test_delete_operations_empty_list(session):
-    
-    data_repository = DataRepository(session_factory=session)
+def test_delete_operations_empty_list(data_repository : DataRepository):
     
     user_id = 2
     
@@ -314,9 +310,7 @@ def test_delete_operations_empty_list(session):
         a.is_equal(b)
         
 
-def test_update_operations_one_operation(session):
-    
-    data_repository = DataRepository(session_factory=session)
+def test_update_operations_one_operation(data_repository : DataRepository):
     
     user_id = 2
     
@@ -341,9 +335,7 @@ def test_update_operations_one_operation(session):
             currency="USD"
         ))
 
-def test_update_operations_many_operations(session):
-    
-    data_repository = DataRepository(session_factory=session)
+def test_update_operations_many_operations(data_repository : DataRepository):
     
     user_id = 2
     

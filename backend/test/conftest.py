@@ -19,27 +19,20 @@ def db():
     return db
 
 @pytest.fixture
-def connection(db : Database):
-    connection = db.create_connection()
-    yield connection
-    connection.close()
-
-@pytest.fixture
 def session(db : Database):
     connection : Connection = db.create_connection()
     transaction : Transaction = connection.begin() 
     
-    @contextmanager
-    def _session():
-        try:
-            session = db.get_session(connection)
-            yield session
-        finally:
-            session.close()
-            
-    yield _session
-    
-    transaction.rollback()
-    connection.close()
-    
+    try:
+        session = db.get_session(connection)
+        yield session
+    finally:
+        session.close()
+        transaction.rollback()
+        connection.close()
+
+# @pytest.fixture
+# def session(db: Database):
+#     connection : Connection = db.create_connection()
+#     return db.get_session(connection)
     
