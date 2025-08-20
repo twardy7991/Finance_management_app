@@ -3,28 +3,29 @@
 from typing import List, Union, Annotated
 from datetime import date
 
-from fastapi import APIRouter, Depends, Response, status, Body, Form, UploadFile, File
-from fastapi.security.oauth2 import OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, Response, status, Body, Form, UploadFile, Header
 from dependency_injector.wiring import Provide, inject
-from jose import JWTError
 import json
+from app.database.exceptions import UserNotSavedError, DataNotFound, UserNotProvidedError 
 
-from app.endpoints.schemes import OperationConditions, OperationOut, CreateUserRequest, Token, Data, Credentials
-from app.database.repositories import DataNotFound, UserNotProvidedError
-from app.services.compute_service import ComputingService
-from app.services.data_service import DataService
-from app.services.user_service import UserService
-from app.services.authentication_service import AuthenticationService
+from app.endpoints.schemes import OperationOut, CreateUserRequest, Data, Credentials, User
+from app.services import SessionService, ComputingService, DataService, UserService, AuthenticationService
 from app.containers import Container
-from app.services.exceptions import TokenNotValidError, OperationsNotFoundError, PasswordIncorrectError, UsernameIncorrectError
+from app.services.exceptions import OperationsNotFoundError, PasswordIncorrectError, UsernameIncorrectError, DuplicateUsernameError
+
+from app.services.utils.dependencies import check_session
 
 router = APIRouter()
+
+protected_router = APIRouter(
+    dependencies=[Depends(check_session)]
+)
 
 @router.get("/status")
 async def _get_status():
     return {"status": "OK"}
 
-@router.get(
+@protected_router.get(
     path="/chart", 
     response_model=Data
     )
@@ -39,7 +40,7 @@ async def _get_trend_data(
     except OperationsNotFoundError as e:
         return Response(status_code=status.HTTP_404_NOT_FOUND, content=str(e))
 
-@router.get(
+@protected_router.get(
     path="/user/data",
     response_model=List[OperationOut]
     )
@@ -63,7 +64,7 @@ async def _get_user_finance_data(
     except DataNotFound as e:
         return Response(status_code=status.HTTP_404_NOT_FOUND, content=str(e))
 
-@router.post(
+@protected_router.post(
     path="/user/upload",
     )
 @inject
@@ -74,7 +75,7 @@ async def _post_user_finance_data(
 ) -> Response:
     try:
         data_service.save_user_operations(user_id, uploaded_file.file)
-        return Response(status_code=status.HTTP_200_OK)
+        return Response(status_code=status.HTTP_201_CREATE)
     except (TypeError, UserNotProvidedError) as e:
         return Response(
             content=json.dumps({"message" : "Nie udało się zapisać danych"}),
@@ -90,19 +91,22 @@ async def _register_user(
     user_request: CreateUserRequest = Body(...),
     user_service : UserService = Depends(Provide[Container.user_service])
 ) -> Response:
-    # try:
+    try:
         user_service.register_user(username=user_request.username, 
                                    password=user_request.password,
                                    name=user_request.name,
                                    surname=user_request.surname,
                                    telephone=user_request.telephone,
                                    address=user_request.address)
-        return Response(status_code=status.HTTP_200_OK)
-    # except Exception:
-    #     return NotImplementedError 
+        return Response(status_code=status.HTTP_201_CREATED)
+    except DuplicateUsernameError as e:
+        return Response(status_code=status.HTTP_409_CONFLICT, content=str(e))
+    except Exception:
+        return NotImplementedError 
 
-@router.get(
-    path="/user/profile"
+@protected_router.get(
+    path="/user/profile",
+    response_model=User
 )
 @inject
 async def _get_user_profile_data(
@@ -120,13 +124,17 @@ async def _get_user_profile_data(
 @inject
 async def _login(
     credentials : Credentials = Body(...),
-    authentication_service : AuthenticationService = Depends(Provide[Container.auth_service])
+    authentication_service : AuthenticationService = Depends(Provide[Container.auth_service]),
+    session_service : SessionService = Depends(Provide[Container.session_service])
 ):
     try:
-        authentication_service.login_user(username=credentials.username,
+        user_id = authentication_service.login_user(username=credentials.username,
                                           password=credentials.password)
+        
+        session_service.create_session(user_id=user_id)
+        
         return Response(
-            content="login successful",
+            content=user_id,
             status_code=status.HTTP_200_OK
         )
     except PasswordIncorrectError as e:
@@ -141,7 +149,17 @@ async def _login(
         )
     except Exception:
         raise NotImplementedError
-        
+
+@protected_router.post(
+    path="/logout"
+)
+@inject
+async def _logout(
+    user_id : str,
+    session_service : SessionService = Depends(Provide[Container.session_service])
+):
+    session_service.delete_session(user_id=user_id)
+    
     # # @inject
     # async def _login_for_token(
     #     self,

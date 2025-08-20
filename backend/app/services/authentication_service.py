@@ -18,7 +18,7 @@ class AuthenticationService:
                    password : str
                    ) -> str:
         
-        credential = self.get_credential(username=username)
+        credential : Credential = self.get_credential(username=username)
 
         if credential is None or credential.username != username:
             raise UsernameIncorrectError
@@ -29,7 +29,6 @@ class AuthenticationService:
             
     
     def check_user_token(self, token : str) -> Tuple[str, int]:
-        
         pass
         # username, user_id = self.auth_tools.check_token(token)
         # if username is None or user_id is None:

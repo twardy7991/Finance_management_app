@@ -19,7 +19,13 @@ class OperationOut(BaseModel):
     
     class Config:
         orm_mode = True
-        
+
+class User(BaseModel):
+    name : str
+    surname: str
+    telephone : str
+    address : str
+
 class CreateUserRequest(BaseModel):
     username : str
     password : str

@@ -3,7 +3,7 @@ from typing import List
 from decimal import Decimal
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, VARCHAR, Text, DATE, NUMERIC
+from sqlalchemy import ForeignKey, VARCHAR, TEXT, DATE, NUMERIC, INTEGER, ARRAY, JSON   
 
 from app.db import Base
 
@@ -16,7 +16,7 @@ class User(Base):
     name: Mapped[str] =  mapped_column(VARCHAR(100), nullable=False)
     surname: Mapped[str] = mapped_column(VARCHAR(100), nullable=False)
     telephone: Mapped[str] = mapped_column(VARCHAR(20), nullable=True)
-    address: Mapped[str] = mapped_column(Text(), nullable=True)
+    address: Mapped[str] = mapped_column(TEXT(), nullable=True)
     
     credential: Mapped['Credential'] = relationship(back_populates="user")
     operations: Mapped[List['Operation']] = relationship(back_populates="user")
@@ -75,7 +75,7 @@ class Operation(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey('users.user_id'))
     operation_date: Mapped[date] = mapped_column(DATE, nullable=False)
     category: Mapped[str] = mapped_column(VARCHAR(50), nullable=True)
-    description: Mapped[str] = mapped_column(Text(), nullable=True)
+    description: Mapped[str] = mapped_column(TEXT(), nullable=True)
     value: Mapped[Decimal] = mapped_column(NUMERIC(12,2, asdecimal=True), nullable=False)
     currency: Mapped[str] = mapped_column(VARCHAR(10), nullable=False)  
     
@@ -100,3 +100,29 @@ class Operation(Base):
                     description='{self.description}', 
                     value={self.value}, 
                     currency='{self.currency}')'''
+                    
+### CLASS MAPPING THE sessions TABLE ###
+
+from app.db import Base_auth
+
+class UserSession(Base_auth):
+    
+    __tablename__ = 'sessions'
+    id : Mapped[int] = mapped_column(primary_key=True)
+    session_id : Mapped[str] = mapped_column(VARCHAR(100))
+    user_id : Mapped[int] = mapped_column(INTEGER)
+    created_at : Mapped[date] = mapped_column(DATE)
+    expires_at : Mapped[date] = mapped_column(DATE)
+    last_active : Mapped[date] = mapped_column(DATE)
+    roles : Mapped[List] = mapped_column(ARRAY(TEXT))
+    session_metadata : Mapped[dict] = mapped_column(JSON) 
+    
+    def __repr__(self):
+        return f'''Operation(operation_id={self.id}, 
+                    user_id={self.session_id}, 
+                    operation_date='{self.user_id}', 
+                    category='{self.created_at}', 
+                    description='{self.expires_at}', 
+                    value={self.last_active}, 
+                    currency='{self.roles},
+                    currency='{self.session_metadata}')'''

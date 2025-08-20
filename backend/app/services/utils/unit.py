@@ -1,7 +1,8 @@
 from abc import ABC, abstractmethod
-from sqlalchemy.orm import Session
 
-from app.database.repositories import UserRepository, CredentialRepository, DataRepository
+from sqlalchemy.orm import Session, sessionmaker
+
+from app.database.repositories import UserRepository, CredentialRepository, DataRepository, SessionRepository
 
 class UnitOfWorkBase(ABC):
     
@@ -22,7 +23,7 @@ class UnitOfWorkBase(ABC):
 class UnitOfWorkCredential(UnitOfWorkBase):
     
     def __init__(self, session_factory):
-        self._session_factory : Session = session_factory
+        self._session_factory : sessionmaker[Session] = session_factory
         
     def __enter__(self):
         self._session : Session = self._session_factory()
@@ -41,7 +42,7 @@ class UnitOfWorkCredential(UnitOfWorkBase):
 class UnitOfWorkUser(UnitOfWorkBase):
     
     def __init__(self, session_factory):
-        self._session_factory : Session = session_factory
+        self._session_factory : sessionmaker[Session] = session_factory
         
     def __enter__(self):
         self._session : Session = self._session_factory()
@@ -60,7 +61,7 @@ class UnitOfWorkUser(UnitOfWorkBase):
 class UnitOfWorkOperation(UnitOfWorkBase):
     
     def __init__(self, session_factory):
-        self._session_factory : Session = session_factory
+        self._session_factory : sessionmaker[Session] = session_factory
         
     def __enter__(self):
         self._session : Session = self._session_factory()
@@ -78,13 +79,29 @@ class UnitOfWorkOperation(UnitOfWorkBase):
     
 class UnitOfWorkRegistration(UnitOfWorkBase):
     
-    def __init__(self, session_factory, ):
-        self._session_factory : Session = session_factory
+    def __init__(self, session_factory):
+        self._session_factory : sessionmaker[Session] = session_factory
 
     def __enter__(self):
         self._session : Session = self._session_factory()
         self.credential_repository = CredentialRepository(self._session)
         self.user_repository = UserRepository(self._session)
+        return super().__enter__()
+    
+    def commit(self):
+        self._session.commit()
+    
+    def rollback(self):
+        self._session.rollback()
+        
+class UnitOfWorkSession(UnitOfWorkBase):
+    
+    def __init__(self, session_factory):
+        self._session_factory : sessionmaker[Session] = session_factory
+
+    def __enter__(self):
+        self._session : Session = self._session_factory()
+        self.repository = SessionRepository(self._session)
         return super().__enter__()
     
     def commit(self):

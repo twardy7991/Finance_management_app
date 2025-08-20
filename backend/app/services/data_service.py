@@ -3,7 +3,6 @@ from typing import List, BinaryIO
 
 import pandas as pd
 
-from app.database.repositories import DataRepository
 from .utils.unit import UnitOfWorkOperation
 from app.database.models import Operation
 from app.services.utils.data_processing import process_file, get_unsaved_operations
@@ -39,13 +38,13 @@ class DataService:
         
         processed_data_file : pd.DataFrame = process_file(datafile)
         
-        date_to = processed_data_file["#Data operacji"].iloc[0].date()
-        date_from = processed_data_file["#Data operacji"].iloc[-1].date()
+        date_to : date = processed_data_file["#Data operacji"].iloc[0].date()
+        date_from : date = processed_data_file["#Data operacji"].iloc[-1].date()
         
         with self.operation_uow as uow:
-            saved_operations = uow.repository.get_user_operations(user_id, date_from, date_to)
+            saved_operations : List[Operation] = uow.repository.get_user_operations(user_id, date_from, date_to)
         
-        operations_to_add = get_unsaved_operations(saved_operations, processed_data_file)
+        operations_to_add : pd.DataFrame = get_unsaved_operations(saved_operations, processed_data_file)
         
         with self.operation_uow as uow:
             uow.repository.add_operations(operations_to_add, user_id)

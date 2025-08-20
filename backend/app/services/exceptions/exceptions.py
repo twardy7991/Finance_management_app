@@ -12,6 +12,23 @@ class TokenNotValidError(AuthError):
     
     def __init__(self):
         super().__init__("could not validate the token")
+
+class DuplicateUsernameError(AuthError):
+    
+    def __init__(self):
+        super().__init__("username is already occupiued")
+        
+class SessionError(Exception): pass
+
+class SessionNotFoundError(SessionError):
+    
+    def __init__(self):
+        super().__init__("session invalid")
+        
+class SessionExpiredError(SessionError):
+    
+    def __init__(self):
+        super().__init__("session expired")
         
 class ServiceError(Exception): pass
 

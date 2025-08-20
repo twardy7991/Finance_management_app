@@ -2,6 +2,11 @@
 -- DROP TABLES IF THEY EXIST (CLEAN START)
 -- =======================================
 
+CREATE DATABASE finance_db_auth;
+CREATE DATABASE finance_db;
+
+\c finance_db
+
 DROP TABLE IF EXISTS financial_operations;
 DROP TABLE IF EXISTS credentials;
 DROP TABLE IF EXISTS users;
@@ -93,3 +98,22 @@ INSERT INTO financial_operations (user_id, operation_date, category, description
 -- Bob
 (1, '2025-05-19', 'Education', 'Online course payment', 120.00, 'USD'),
 (1, '2025-05-20', 'Books', 'Bought books on Amazon', 35.99, 'USD');
+
+\c finance_db_auth
+
+DROP TABLE IF EXISTS sessions;
+
+CREATE TABLE sessions (
+    id SERIAL PRIMARY KEY,
+    session_id VARCHAR(100) UNIQUE NOT NULL,
+    user_id INTEGER UNIQUE,
+    created_at DATE NOT NULL,
+    expires_at DATE NOT NULL,
+    last_active DATE NOT NULL,
+    roles TEXT[],
+    session_metadata JSON
+)
+
+-- INSERT INTO sessions (user_id, operation_date, category, description, value, currency) VALUES
+-- -- John
+-- (1, '2025-05-20', 'Groceries', 'Walmart grocery shopping', 75.20, 'USD'),

@@ -1,15 +1,15 @@
 from datetime import date
-from typing import List, Tuple, Literal, Dict, Union
+from typing import List, Tuple, Literal, Dict
 import logging
 import abc
 from decimal import Decimal
 
-from sqlalchemy.orm import Session, sessionmaker
-from sqlalchemy import select, insert, delete, update, Delete, Select, Insert, Update
+from sqlalchemy.orm import Session
+from sqlalchemy import select, insert, delete, update, Delete, Select, Insert
 from pandas import DataFrame
 
-from app.database.models import Operation, User, Credential
-from app.database.exceptions import UserNotProvidedError, UserNotSavedError, DataNotFound 
+from app.database.models import Operation, User, Credential, UserSession
+from app.database.exceptions import UserNotSavedError, DataNotFound 
 from app.database.utils.utils import stmt_parser, data_frame_to_operation_list
 
 logger = logging.getLogger(__name__)
@@ -104,10 +104,9 @@ class UserRepository(Repository):
             
             logger.debug(f"Fetched user info for user_id={user_id} : {result}")
             
-            if result:
-                return result[0]
+            return result[0]
             
-            return None
+            #return None
 
         def save_user(self ,
                 name : str, 
@@ -175,6 +174,42 @@ class CredentialRepository(Repository):
         
         result : Credential = self._session.scalar(stmt)
         
-        logger.debug(f"Fetched credentials for user_id={username} : {result}")
+        logger.debug(f"Fetched credentials for username={username} : {result}")
+        logger.debug(f"class : {type(Credential)}")
 
         return result
+    
+class SessionRepository(Repository):
+    
+    def save_session(self, session_id : str, 
+                    user_id : int,
+                    created_at : date,
+                    expires_at : date,
+                    last_active : date,
+                    roles : List[str],
+                    metadata : Dict[str, str]
+                    ) -> None:
+        
+        stmt : Insert = insert(UserSession).values(session_id=session_id, user_id=user_id, created_at=created_at, expires_at=expires_at, last_active=last_active, roles=roles, session_metadata=metadata)
+
+        self._session.execute(stmt)
+        
+        return
+    
+    def get_session(self, session_id : int) -> UserSession:
+        
+        stmt = select(UserSession).where(UserSession.session_id == session_id)
+        
+        result : UserSession = self._session.scalar(stmt)
+        
+        logger.debug(f"Fetched Session for user_id={result.user_id} : {result}")
+        
+        return result
+    
+    def delete_session(self, user_id : int) -> None:
+        
+        stmt = delete(UserSession).where(UserSession.user_id == user_id)
+        
+        self._session.execute(stmt)
+        
+        logger.debug(f"Deleted session for user: {user_id}")

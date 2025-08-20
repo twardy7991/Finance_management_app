@@ -1,14 +1,12 @@
 from fastapi.security import OAuth2PasswordBearer
 from dependency_injector import containers, providers
+from sqlalchemy.orm import DeclarativeBase
 
-from .db import Database
-from app.services.authentication_service import AuthenticationService
-from app.services.compute_service import ComputingService
-from app.services.user_service import UserService
-from app.services.data_service import DataService
-from app.services.utils.unit import UnitOfWorkRegistration, UnitOfWorkCredential, UnitOfWorkOperation, UnitOfWorkUser
+from app.db import Database, Base, Base_auth
+from app.services.utils.unit import UnitOfWorkRegistration, UnitOfWorkCredential, UnitOfWorkOperation, UnitOfWorkUser, UnitOfWorkSession
 from app.auth.auth import AuthenticationTools 
 from app.services.utils.clients import ComputeClient
+from app.services import SessionService, ComputingService, DataService, UserService, AuthenticationService
 
 ### CONTAINER CLASS THAT CONSTRUCTS ALL DEPENDENCIES ### 
 
@@ -20,15 +18,16 @@ class Container(containers.DeclarativeContainer):
     config.from_yaml("config/config.yml")
     
     db = providers.Singleton(Database, db_url=config.db.url) 
+    db_auth = providers.Singleton(Database, db_url=config.db_auth.url)   
     
     # utils/clients
     auth_tools = providers.Factory(
         AuthenticationTools,
     )
     
-    oauth2_bearer = providers.Factory(
-        oauth2_bearer=OAuth2PasswordBearer(tokenUrl='auth/token')
-    )
+    # oauth2_bearer = providers.Factory(
+    #     oauth2_bearer=OAuth2PasswordBearer(tokenUrl='auth/token')
+    # )
     
     compute_client = providers.Factory(
         ComputeClient,
@@ -56,6 +55,11 @@ class Container(containers.DeclarativeContainer):
         session_factory=db.provided.session_factory,
     )
     
+    session_uow = providers.Factory(
+        UnitOfWorkSession,
+        session_factory=db_auth.provided.session_factory
+    )
+    
     # services
     auth_service = providers.Factory(
         AuthenticationService,
@@ -79,6 +83,12 @@ class Container(containers.DeclarativeContainer):
         ComputingService,
         compute_client = compute_client,
         operation_uow=operation_uow
+    )
+    
+    session_service = providers.Factory(
+        SessionService,
+        session_uow=session_uow,
+        auth_tools=auth_tools
     )
     
 

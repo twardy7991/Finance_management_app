@@ -4,8 +4,10 @@ from contextlib import contextmanager
 from sqlalchemy import create_engine, text, Connection, orm
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
+Base_auth = declarative_base()
 
 ### CLASS THAT HANDLES CONNECTION WITH DATABASE ###
 
@@ -30,6 +32,9 @@ class Database:
             ),
         )
     
+    def get_engine(self):
+        return self._engine
+    
     def check_connection(self) -> None:
         try:
             with self._engine.connect() as connection:
@@ -52,7 +57,7 @@ class Database:
     def create_connection(self) -> Connection:
         return self._engine.connect()
         
-    def session_factory(self) -> Session:
+    def session_factory(self) -> sessionmaker[Session]:
         # try:
             return self._session_factory
         # except Exception as e:

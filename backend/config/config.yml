@@ -1,5 +1,7 @@
 db:
   url: postgresql+psycopg2://postgres:postgres@localhost:5432/finance_db
+db_auth:
+  url: postgresql+psycopg2://postgres:postgres@localhost:5432/finance_db_auth
 
 compute:
   url: http://127.0.0.1:8001

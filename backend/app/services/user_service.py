@@ -1,7 +1,8 @@
 from app.database.models import User
 from .utils.unit import UnitOfWorkRegistration, UnitOfWorkUser
 from app.auth.auth import AuthenticationTools
-
+from sqlalchemy.exc import IntegrityError
+from .exceptions import DuplicateUsernameError
 ### CLASS RESPONSIBLE THE USER SERVICES ###
 
 class UserService:
@@ -22,17 +23,20 @@ class UserService:
         
         with self.uow_registration as uow:
             
-            user_id = uow.user_repository.save_user(name=name, 
-                                                 surname=surname, 
-                                                 telephone=telephone, 
-                                                 address=address)
-        
-            uow.credential_repository.save_credentials(user_id=user_id,
-                                username=username, 
-                                hashed_password=self.auth_tools.hash(password))
-
-            uow.commit()
+            user_id : int = uow.user_repository.save_user(name=name, 
+                                                    surname=surname, 
+                                                    telephone=telephone, 
+                                                    address=address)    
+                
+            try: 
+                uow.credential_repository.save_credentials(user_id=user_id,
+                                    username=username, 
+                                    hashed_password=self.auth_tools.hash(password))
+            except IntegrityError as e:
+                raise DuplicateUsernameError
             
+            uow.commit()
+                
         return user_id 
     
     def get_user(self, user_id : int) -> User:

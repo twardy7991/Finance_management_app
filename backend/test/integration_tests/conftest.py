@@ -20,16 +20,7 @@ def connection(db : Database):
     connection = db.create_connection()
     yield connection
     connection.close()
-
-# @pytest.fixture
-# def session_factory(connection : Connection):
-#     session_factory = orm.sessionmaker(
-#             autocommit=False,
-#             autoflush=False,
-#             bind=connection,
-#     )
-#     yield session_factory
-    
+ 
 @pytest.fixture
 def session_factory(db : Database):
     connection : Connection = db.create_connection()
