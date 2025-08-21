@@ -6,19 +6,19 @@ from datetime import date
 from fastapi import APIRouter, Depends, Response, status, Body, Form, UploadFile, Header
 from dependency_injector.wiring import Provide, inject
 import json
-from app.database.exceptions import UserNotSavedError, DataNotFound, UserNotProvidedError 
+from app.database.exceptions import DataNotFound, UserNotProvidedError 
 
 from app.endpoints.schemes import OperationOut, CreateUserRequest, Data, Credentials, User
 from app.services import SessionService, ComputingService, DataService, UserService, AuthenticationService
 from app.containers import Container
 from app.services.exceptions import OperationsNotFoundError, PasswordIncorrectError, UsernameIncorrectError, DuplicateUsernameError
 
-from app.services.utils.dependencies import check_session
+from app.endpoints.dependencies import get_current_user
 
 router = APIRouter()
 
 protected_router = APIRouter(
-    dependencies=[Depends(check_session)]
+    #dependencies=[Depends(check_session)]
 )
 
 @router.get("/status")
@@ -32,7 +32,7 @@ async def _get_status():
 @inject
 async def _get_trend_data(
     computing_service : Annotated[ComputingService, Depends(Provide[Container.compute_service])],
-    user_id : int
+    user_id : int = Depends(get_current_user)
 )-> Response | Union[List[List[int]], List[int]]:  
     try:
         data : Data = computing_service.calculate_trend(user_id=user_id)
@@ -47,7 +47,7 @@ async def _get_trend_data(
 @inject
 async def _get_user_finance_data(
     data_service: Annotated[DataService, Depends(Provide[Container.data_service])],
-    user_id : int,
+    user_id : int = Depends(get_current_user),
     date_from : date | None = None,
     date_to : date | None = None,
     order : str = "asc",
@@ -70,12 +70,12 @@ async def _get_user_finance_data(
 @inject
 async def _post_user_finance_data(
     data_service: Annotated[DataService ,Depends(Provide[Container.data_service])],
-    user_id : int = Form(...),
+    user_id : int = Depends(get_current_user),
     uploaded_file : UploadFile = Form(...),
 ) -> Response:
     try:
         data_service.save_user_operations(user_id, uploaded_file.file)
-        return Response(status_code=status.HTTP_201_CREATE)
+        return Response(status_code=status.HTTP_201_CREATED)
     except (TypeError, UserNotProvidedError) as e:
         return Response(
             content=json.dumps({"message" : "Nie udało się zapisać danych"}),
@@ -110,7 +110,7 @@ async def _register_user(
 )
 @inject
 async def _get_user_profile_data(
-    user_id : int,
+    user_id : Annotated[int, Depends(get_current_user)],
     user_service : UserService = Depends(Provide[Container.user_service])
 ):
     try:
@@ -131,10 +131,10 @@ async def _login(
         user_id = authentication_service.login_user(username=credentials.username,
                                           password=credentials.password)
         
-        session_service.create_session(user_id=user_id)
+        session_id = session_service.create_session(user_id=user_id)
         
         return Response(
-            content=user_id,
+            content=session_id,
             status_code=status.HTTP_200_OK
         )
     except PasswordIncorrectError as e:
@@ -155,7 +155,7 @@ async def _login(
 )
 @inject
 async def _logout(
-    user_id : str,
+    user_id : int = Depends(get_current_user),
     session_service : SessionService = Depends(Provide[Container.session_service])
 ):
     session_service.delete_session(user_id=user_id)

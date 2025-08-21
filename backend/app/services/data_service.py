@@ -48,3 +48,5 @@ class DataService:
         
         with self.operation_uow as uow:
             uow.repository.add_operations(operations_to_add, user_id)
+            
+            uow.commit()

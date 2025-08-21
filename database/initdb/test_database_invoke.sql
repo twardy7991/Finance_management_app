@@ -44,7 +44,7 @@ CREATE TABLE financial_operations (
 -- ========================
 
 INSERT INTO users (name, surname, telephone, address) VALUES
-('John', 'Doe', '123456789', '123 Main St, Springfield'),
+('Admin', 'Admin', '123456789', 'address'),
 ('Jane', 'Smith', '987654321', '456 Elm St, Springfield'),
 ('Alice', 'Brown', '555123456', '789 Oak Ave, Shelbyville'),
 ('Bob', 'Johnson', '666999333', '321 Pine Rd, Ogdenville');
@@ -54,7 +54,7 @@ INSERT INTO users (name, surname, telephone, address) VALUES
 -- ========================
 
 INSERT INTO credentials (user_id, username, password) VALUES
-(1, 'johndoe', 'pass1'),
+(1, 'admin', '$5$rounds=535000$vlEhpIa9GRbMqHnW$5ZF5iCBTzZX6uN44L5WMl4UqlbKhX0ihA10n4m1u3A0'),
 (2, 'janesmith', 'pass2'),
 (3, 'aliceb', 'pass3'),
 (4, 'bobbyj', 'pass4');
@@ -107,13 +107,13 @@ CREATE TABLE sessions (
     id SERIAL PRIMARY KEY,
     session_id VARCHAR(100) UNIQUE NOT NULL,
     user_id INTEGER UNIQUE,
-    created_at DATE NOT NULL,
-    expires_at DATE NOT NULL,
-    last_active DATE NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    last_active TIMESTAMP NOT NULL,
     roles TEXT[],
     session_metadata JSON
-)
+);
 
--- INSERT INTO sessions (user_id, operation_date, category, description, value, currency) VALUES
--- -- John
--- (1, '2025-05-20', 'Groceries', 'Walmart grocery shopping', 75.20, 'USD'),
+INSERT INTO sessions (id, session_id, user_id, created_at, expires_at, last_active) VALUES
+
+(10, 'SCKXWjK7uIgKefL3tY8C862ny-t07I1Mn5Gx5DnwfPA', 1, '2025-08-20', '2025-12-30', '2025-08-20');

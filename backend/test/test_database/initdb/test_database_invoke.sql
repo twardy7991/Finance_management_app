@@ -2,6 +2,11 @@
 -- DROP TABLES IF THEY EXIST (CLEAN START)
 -- =======================================
 
+CREATE DATABASE finance_db_test;
+CREATE DATABASE finance_db_auth_test;
+
+\c finance_db_test
+
 DROP TABLE IF EXISTS financial_operations;
 DROP TABLE IF EXISTS credentials;
 DROP TABLE IF EXISTS users;
@@ -50,7 +55,7 @@ INSERT INTO users (name, surname, telephone, address) VALUES
 -- ========================
 
 INSERT INTO credentials (user_id, username, password) VALUES
-(1, 'johndoe', 'pass1'),
+(1, 'admin', '$5$rounds=535000$vlEhpIa9GRbMqHnW$5ZF5iCBTzZX6uN44L5WMl4UqlbKhX0ihA10n4m1u3A0'),
 (2, 'janesmith', 'pass2'),
 (3, 'aliceb', 'pass3'),
 (4, 'bobbyj', 'pass4');
@@ -94,3 +99,23 @@ INSERT INTO financial_operations (user_id, operation_date, category, description
 -- Bob
 (1, '2025-05-19', 'Education', 'Online course payment', 120.00, 'USD'),
 (1, '2025-05-20', 'Books', 'Bought books on Amazon', 35.99, 'USD');
+
+
+\c finance_db_auth_test
+
+DROP TABLE IF EXISTS sessions;
+
+CREATE TABLE sessions (
+    id SERIAL PRIMARY KEY,
+    session_id VARCHAR(100) UNIQUE NOT NULL,
+    user_id INTEGER UNIQUE,
+    created_at TIMESTAMP NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    last_active TIMESTAMP NOT NULL,
+    roles TEXT[],
+    session_metadata JSON
+);
+
+INSERT INTO sessions (id, session_id, user_id, created_at, expires_at, last_active) VALUES
+
+(10, 'SCKXWjK7uIgKefL3tY8C862ny-t07I1Mn5Gx5DnwfPA', 1, '2025-08-20', '2025-12-30', '2025-08-20');

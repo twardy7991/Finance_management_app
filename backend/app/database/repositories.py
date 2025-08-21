@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import List, Tuple, Literal, Dict
 import logging
 import abc
@@ -179,13 +179,19 @@ class CredentialRepository(Repository):
 
         return result
     
+    # def delete_credentials(self,
+    #                        username : str):
+        
+    #     stmt = delete
+    
 class SessionRepository(Repository):
     
-    def save_session(self, session_id : str, 
+    def save_session(self, 
+                    session_id : str, 
                     user_id : int,
-                    created_at : date,
-                    expires_at : date,
-                    last_active : date,
+                    created_at : datetime,
+                    expires_at : datetime,
+                    last_active : datetime,
                     roles : List[str],
                     metadata : Dict[str, str]
                     ) -> None:
@@ -198,17 +204,18 @@ class SessionRepository(Repository):
     
     def get_session(self, session_id : int) -> UserSession:
         
-        stmt = select(UserSession).where(UserSession.session_id == session_id)
+        stmt : Select = select(UserSession).where(UserSession.session_id == session_id)
         
         result : UserSession = self._session.scalar(stmt)
         
-        logger.debug(f"Fetched Session for user_id={result.user_id} : {result}")
+        if result:
+            logger.debug(f"Fetched Session for user_id={result.user_id} : {result}")
         
         return result
     
     def delete_session(self, user_id : int) -> None:
         
-        stmt = delete(UserSession).where(UserSession.user_id == user_id)
+        stmt : Delete = delete(UserSession).where(UserSession.user_id == user_id)
         
         self._session.execute(stmt)
         

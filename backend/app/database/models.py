@@ -1,9 +1,9 @@
-from datetime import date
+from datetime import date, datetime
 from typing import List
 from decimal import Decimal
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, VARCHAR, TEXT, DATE, NUMERIC, INTEGER, ARRAY, JSON   
+from sqlalchemy import ForeignKey, VARCHAR, TEXT, DATE, NUMERIC, INTEGER, ARRAY, JSON, TIMESTAMP   
 
 from app.db import Base
 
@@ -53,11 +53,11 @@ class Credential(Base):
         
         
     # needed for testing
-    def is_equal(self, other, context) -> bool:
+    def is_equal(self, other, context=None) -> bool:
         return (
             self.user_id == other.user_id and
             self.username == other.username and 
-            context.verify(other.password, self.password) 
+            (context.verify(other.password, self.password) if context else other.password == self.password)
         )      
     
     def __repr__(self):
@@ -111,18 +111,30 @@ class UserSession(Base_auth):
     id : Mapped[int] = mapped_column(primary_key=True)
     session_id : Mapped[str] = mapped_column(VARCHAR(100))
     user_id : Mapped[int] = mapped_column(INTEGER)
-    created_at : Mapped[date] = mapped_column(DATE)
-    expires_at : Mapped[date] = mapped_column(DATE)
-    last_active : Mapped[date] = mapped_column(DATE)
+    created_at : Mapped[datetime] = mapped_column(TIMESTAMP)
+    expires_at : Mapped[datetime] = mapped_column(TIMESTAMP)
+    last_active : Mapped[datetime] = mapped_column(TIMESTAMP)
     roles : Mapped[List] = mapped_column(ARRAY(TEXT))
     session_metadata : Mapped[dict] = mapped_column(JSON) 
     
+    def is_equal(self, other) -> bool:
+        return (
+            self.session_id == other.session_id and
+            self.user_id == other.user_id and
+            self.created_at == other.created_at and
+            self.expires_at == other.expires_at and
+            self.last_active == other.last_active and
+            self.roles == other.roles and 
+            self.session_metadata == other.session_metadata
+        )  
+    
     def __repr__(self):
-        return f'''Operation(operation_id={self.id}, 
-                    user_id={self.session_id}, 
-                    operation_date='{self.user_id}', 
-                    category='{self.created_at}', 
-                    description='{self.expires_at}', 
-                    value={self.last_active}, 
-                    currency='{self.roles},
-                    currency='{self.session_metadata}')'''
+        return f'''UserSession(
+                    id={self.id}
+                    session_id={self.session_id}, 
+                    user_id={self.user_id}, 
+                    created_at={self.created_at}, 
+                    expires_at={self.expires_at}, 
+                    last_active={self.last_active}, 
+                    roles={self.roles},
+                    session_metadata={self.session_metadata})'''

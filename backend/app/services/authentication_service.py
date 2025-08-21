@@ -25,7 +25,7 @@ class AuthenticationService:
         elif not self.auth_tools.compare_hash(password=password, hashed_password=credential.password):
             raise PasswordIncorrectError
         else:
-            return
+            return credential.user_id
             
     
     def check_user_token(self, token : str) -> Tuple[str, int]:
