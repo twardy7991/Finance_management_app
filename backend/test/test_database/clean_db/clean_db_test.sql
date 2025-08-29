@@ -1,15 +1,7 @@
--- =======================================
--- DROP TABLES IF THEY EXIST (CLEAN START)
--- =======================================
-
-CREATE DATABASE finance_db_auth;
-CREATE DATABASE finance_db;
-
-\c finance_db
-
 DROP TABLE IF EXISTS financial_operations;
 DROP TABLE IF EXISTS credentials;
 DROP TABLE IF EXISTS users;
+
 -- ========================
 -- CREATE TABLES
 -- ========================
@@ -44,7 +36,7 @@ CREATE TABLE financial_operations (
 -- ========================
 
 INSERT INTO users (name, surname, telephone, address) VALUES
-('Admin', 'Admin', '123456789', 'address'),
+('John', 'Doe', '123456789', '123 Main St, Springfield'),
 ('Jane', 'Smith', '987654321', '456 Elm St, Springfield'),
 ('Alice', 'Brown', '555123456', '789 Oak Ave, Shelbyville'),
 ('Bob', 'Johnson', '666999333', '321 Pine Rd, Ogdenville');
@@ -70,21 +62,21 @@ INSERT INTO financial_operations (user_id, operation_date, category, description
 (1, '2025-05-21', 'Entertainment', 'Netflix subscription', 12.99, 'USD'),
 
 -- Jane
-(2, '2025-05-18', 'Utilities', 'Electricity bill', 65.75, 'USD'),
-(2, '2025-05-19', 'Dining', 'Dinner at Luigi''s', 45.00, 'USD'),
-(2, '2025-05-22', 'Health', 'Pharmacy purchase', 22.10, 'USD'),
+(2, '2025-05-18', 'Utilities', 'Electricity bill', -65.75, 'USD'),
+(2, '2025-05-19', 'Dining', 'Dinner at Luigi''s', -45.00, 'USD'),
+(2, '2025-05-22', 'Health', 'Pharmacy purchase', -22.10, 'USD'),
 
 -- Alice
-
-(3, '2025-05-18', 'Groceries', 'Local farmer''s market', 28.50, 'USD'),
+(3, '2025-05-17', 'Travel', 'Train ticket to Capital City', -30.00, 'USD'),
+(3, '2025-05-18', 'Groceries', 'Local farmer''s market', -28.50, 'USD'),
 
 -- Bob
-(4, '2025-05-19', 'Education', 'Online course payment', 120.00, 'USD'),
-(4, '2025-05-20', 'Books', 'Bought books on Amazon', 35.99, 'USD'),
+(4, '2025-05-19', 'Education', 'Online course payment', -120.00, 'USD'),
+(4, '2025-05-20', 'Books', 'Bought books on Amazon', -35.99, 'USD'),
 
-(1, '2025-05-20', 'Groceries', 'Walmart grocery shopping', 75.20, 'USD'),
-(1, '2025-05-21', 'Transport', 'Uber to downtown', 15.00, 'USD'),
-(1, '2025-05-21', 'Entertainment', 'Netflix subscription', 12.99, 'USD'),
+(1, '2025-05-20', 'Groceries', 'Walmart grocery shopping', -75.20, 'USD'),
+(1, '2025-05-21', 'Transport', 'Uber to downtown', -15.00, 'USD'),
+(1, '2025-05-21', 'Entertainment', 'Netflix subscription', -12.99, 'USD'),
 
 -- Jane
 (1, '2025-05-18', 'Utilities', 'Electricity bill', 65.75, 'USD'),
@@ -98,30 +90,3 @@ INSERT INTO financial_operations (user_id, operation_date, category, description
 -- Bob
 (1, '2025-05-19', 'Education', 'Online course payment', 120.00, 'USD'),
 (1, '2025-05-20', 'Books', 'Bought books on Amazon', 35.99, 'USD');
-
-\c finance_db_auth
-
-DROP TABLE IF EXISTS sessions;
-
-CREATE TABLE sessions (
-    id SERIAL PRIMARY KEY,
-    session_id VARCHAR(100) UNIQUE NOT NULL,
-    user_id INTEGER UNIQUE,
-    created_at TIMESTAMP NOT NULL,
-    expires_at TIMESTAMP NOT NULL,
-    last_active TIMESTAMP NOT NULL,
-    roles TEXT[],
-    session_metadata JSON
-);
-
-INSERT INTO sessions (id, session_id, user_id, created_at, expires_at, last_active) VALUES
-
-(10, 'SCKXWjK7uIgKefL3tY8C862ny-t07I1Mn5Gx5DnwfPA', 1, '2025-08-20', '2025-12-30', '2025-08-20');
-
-CREATE EXTENSION IF NOT EXISTS pg_cron;
-
--- Run the delete every minute
-SELECT cron.schedule('* * * * *', $$
-    DELETE FROM sessions
-    WHERE expires_at < NOW();
-$$);

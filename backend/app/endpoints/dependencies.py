@@ -1,6 +1,7 @@
 from fastapi import Header, Response, status, Depends
 from dependency_injector.wiring import Provide, inject
 
+from fastapi import HTTPException
 from app.database.models import UserSession
 from app.containers import Container
 from app.services import SessionService
@@ -10,15 +11,15 @@ def get_session_id(authorization : str = Header(...)):
     scheme, _, session_id = authorization.partition(" ")
     
     if scheme.lower() != "bearer":
-        return Response(
+        raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content="Invalid token type",
+            detail="Invalid token type",
         )
         
     if not session_id:
-        return Response(
+        return HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content="Missing session id",
+            detail="Missing session id",
         )
 
     return session_id
@@ -29,11 +30,13 @@ def get_current_user(session_id : str = Depends(get_session_id),
     try:
         user_id : UserSession = session_service.get_current_user(session_id=session_id)
     except SessionNotFoundError as e:
-        return Response(status_code=status.HTTP_404_NOT_FOUND,
-                        content=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e))
     except SessionExpiredError as e:
-        return Response(status_code=status.HTTP_401_UNAUTHORIZED,
-            content=str(e)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(e)
         )
     
     return user_id

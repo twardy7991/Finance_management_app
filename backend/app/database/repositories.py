@@ -215,6 +215,8 @@ class SessionRepository(Repository):
     
     def delete_session(self, user_id : int) -> None:
         
+        logger.debug(user_id)
+        
         stmt : Delete = delete(UserSession).where(UserSession.user_id == user_id)
         
         self._session.execute(stmt)
