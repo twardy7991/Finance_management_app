@@ -114,3 +114,44 @@ def operations_to_save():
             currency="USD"
         ),
     ]
+
+from app.main import app
+from app.containers import Container
+import pytest
+from fastapi.testclient import TestClient
+
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import text
+
+    
+# @pytest.fixture(autouse=True)
+# def clean_db(db):
+    
+#     Session = sessionmaker(bind=db.get_engine())
+#     session = Session()
+#     yield
+#     with open("test_database/clean_db/clean_db_test.sql") as f:
+#         sql = f.read()
+
+#     session.execute(text(sql))
+#     session.commit()
+#     session.close()
+    
+# @pytest.fixture(autouse=True)
+# def clean_db(db_auth):
+    
+#     Session = sessionmaker(bind=db_auth.get_engine())
+#     session = Session()
+#     yield
+#     with open("test_database/clean_db/clean_db_auth_test.sql") as f:
+#         sql = f.read()
+
+#     session.execute(text(sql))
+#     session.commit()
+#     session.close()
+
+
+# @pytest.fixture
+# def client():
+#     yield TestClient(app)
+ 

@@ -55,6 +55,11 @@ class SessionService:
     def delete_session(self, user_id : int) -> None:
         
         with self.session_uow as uow:
+            if not isinstance(user_id, int):
+                print(user_id.status_code)
+                print(str(user_id))
+                raise TypeError
+            
             uow.repository.delete_session(user_id=user_id)
 
             uow.commit()

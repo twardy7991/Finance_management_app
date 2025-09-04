@@ -5,12 +5,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-class OperationConditions(BaseModel):
-    user_id : int 
-    date_from : date | None = None
-    date_to: date | None = None
-
-class OperationOut(BaseModel):
+class Operation(BaseModel):
     operation_date : date
     category : str
     description : str
@@ -26,24 +21,18 @@ class User(BaseModel):
     telephone : str
     address : str
 
-class CreateUserRequest(BaseModel):
-    username : str
-    password : str
-    name : str
-    surname: str
-    telephone : str
-    address : str
-    
 class Credentials(BaseModel):
     username : str
     password : str
-    
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-    
+
+class CreateUserRequest(Credentials, User):
+    pass
+
 class Data(BaseModel):
     intercept : float
     coeff : List[float] 
     prediction : List[float]
+
+class Session(BaseModel):
+    session_id : str
         
