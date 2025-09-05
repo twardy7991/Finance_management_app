@@ -11,6 +11,7 @@ class ProfileViewModel:
         self.telephone = "phone"
         self.address = "address"
         self.email = "email"
+        self.updated = False
         
         self.fetch_user()
         
@@ -23,4 +24,11 @@ class ProfileViewModel:
         self.surname = user_data["surname"]
         self.telephone = user_data["telephone"]
         self.address = user_data["address"]
+    
+    def update_user(self, data):
         
+        self.model.update_user(data)
+        self.updated = True
+    
+    def set_updated(self):
+        self.updated = False

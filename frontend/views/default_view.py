@@ -3,33 +3,34 @@ from view_models.profile_view_model import ProfileViewModel
 from models.user_model import UserModel
 from models.operation_model import OperationModel
 from view_models.operation_view_model import OperationViewModel
+from app_state import AppState
 
 class DefaultView(QWidget):
     
     def __init__(self, parent):
         super().__init__()
         layout = QVBoxLayout()
-        layout.addLayout(NavigationBar(parent))
+        layout.addWidget(NavigationBar(self, parent))
         self.setLayout(layout)
     
-class NavigationBar(QHBoxLayout):
+class NavigationBar(QWidget):
 
-    def __init__(self, parent):
+    def __init__(self, parent, window):
         super().__init__(parent)
-        
-        self.window = self.parent()
-        self.addWidget(HomeButton(parent))
-        self.addWidget(OperationsButton(parent))
-        self.addWidget(DashboardButton(parent))
-        self.addWidget(ProfileButton(parent))    
-        self.addWidget(LogoutButton(parent))
+        layout  = QHBoxLayout()
+        layout.addWidget(HomeButton(self, window))
+        layout.addWidget(OperationsButton(self, window))
+        layout.addWidget(DashboardButton(self, window))
+        layout.addWidget(ProfileButton(self, window))    
+        layout.addWidget(LogoutButton(self, window))
+        self.setLayout(layout)
     
 class HomeButton(QPushButton):
     
-    def __init__(self, parent):
+    def __init__(self, parent, window):
         super().__init__(parent)
         self.setText("Home")
-        self.parent_window = parent 
+        self.parent_window = window 
         self.clicked.connect(self.go_home)
 
     def go_home(self):
@@ -38,10 +39,10 @@ class HomeButton(QPushButton):
         
 class OperationsButton(QPushButton):
     
-    def __init__(self, parent):
+    def __init__(self, parent, window):
         super().__init__(parent)
         self.setText("Operations")
-        self.parent_window = parent 
+        self.parent_window = window 
         self.clicked.connect(self.go_operations)
 
     def go_operations(self):
@@ -50,10 +51,10 @@ class OperationsButton(QPushButton):
     
 class ProfileButton(QPushButton):
 
-    def __init__(self, parent):
+    def __init__(self, parent, window):
         super().__init__(parent)
         self.setText("Profile")
-        self.parent_window = parent 
+        self.parent_window = window 
         self.clicked.connect(self.go_profile)
 
     def go_profile(self):
@@ -63,11 +64,11 @@ class ProfileButton(QPushButton):
 
 class DashboardButton(QPushButton):
 
-    def __init__(self, parent):
+    def __init__(self, parent, window):
         super().__init__(parent)
         
         self.setText("Dashboard")
-        self.parent_window = parent 
+        self.parent_window = window 
         self.clicked.connect(self.go_dashboard)
 
     def go_dashboard(self):
@@ -76,17 +77,21 @@ class DashboardButton(QPushButton):
         
 class LogoutButton(QPushButton):
     
-    def __init__(self, parent=None):
+    def __init__(self, parent, window):
         super().__init__(parent)
         self.setText("Logout")
-        
+        self.parent_window = window
         self.clicked.connect(self.logout)
         
     def logout(self):
         from .login_view import LoginViewModel
         from models.login_model import LoginModel
-        self.login_view_model = LoginViewModel(LoginModel(), self.parent().app_state)
+        from views.login_view import LoginView
+        from app_state import AppState
+        
+        self.login_view_model = LoginViewModel(LoginModel(), AppState())
         self.login_view_model.logout()
+        self.parent_window.setWidget(LoginView(self.parent_window, LoginViewModel(LoginModel(), AppState())))
     
 if __name__ == "__main__":
     from PyQt6.QtWidgets import QMainWindow, QApplication

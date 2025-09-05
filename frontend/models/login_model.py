@@ -1,8 +1,7 @@
-from models.utils.load_env import URL
 import requests
 from  requests import Response
 import logging
-from models.utils.auth import set_token, TokenAuth
+from models.model import Model
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) 
@@ -12,11 +11,7 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
         
 
-class LoginModel():
-    
-    def __init__(self):
-        
-        self.url = URL
+class LoginModel(Model):
         
     def post_login(self, payload : dict[str, str]) -> Response:
         
@@ -30,7 +25,7 @@ class LoginModel():
         
         logger.debug(f"logging out the user")
         
-        response = requests.post(f"{self.url}/user/logout", auth=TokenAuth())
+        response = requests.post(f"{self.url}/user/logout", auth=self.token_auth)
         
         logger.debug(f"logout status : {response.status_code}")
         

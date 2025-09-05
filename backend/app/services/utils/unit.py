@@ -37,7 +37,6 @@ class UnitOfWorkCredential(UnitOfWorkBase):
         self._session.rollback()
     
     def commit(self):
-        self._session.commit()
         
 class UnitOfWorkUser(UnitOfWorkBase):
     

@@ -32,7 +32,7 @@ class LoginView(QWidget):
     def send_login_request(self):
         self.viewmodel.login(self.username, self.password)
         if self.viewmodel.logged:
-            self.parent_window.setWidget(HomeView(parent=self.parent_window))
+            self.parent_window.setWidget(HomeView(self.parent_window))
             msg = QMessageBox()
             msg.setText(self.viewmodel.login_message)    
             msg.exec()

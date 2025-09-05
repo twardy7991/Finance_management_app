@@ -116,7 +116,7 @@ async def _register_user(
 )
 @inject
 async def _get_user_profile_data(
-    user_id : Annotated[int, Depends(get_current_user)],
+    user_id : int = Depends(get_current_user),
     user_service : UserService = Depends(Provide[Container.user_service])
 ):
     try:
@@ -162,8 +162,21 @@ async def _login(
 )
 @inject
 async def _logout(
-    user_id : Annotated[int, Depends(get_current_user)],
+    user_id : int = Depends(get_current_user),
     session_service : SessionService = Depends(Provide[Container.session_service])
 ):
     session_service.delete_session(user_id=user_id)
-      
+
+@protected_router.patch(
+    path="/user/update",
+    tags=["user"]
+)
+@inject
+async def _update_user(
+    user_id : int = Depends(get_current_user),
+    data : dict[str, str]  = Body(...),
+    user_service : UserService = Depends(Provide[Container.user_service])
+) -> Response:
+    if user_service.update_user(user_id=user_id, data=data):
+        return Response(status_code=status.HTTP_200_OK)
+    return Response(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)

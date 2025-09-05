@@ -126,11 +126,11 @@ class UserRepository(Repository):
             
             return pk
         
-        def update_user(self, user_id, data):
+        def update_user(self, user_id : int, data : List[dict[str, dict[str, str]]]):
                 
-            update_params = [{
+            update_params : List[dict[str, str]] = [{
                     "user_id" : user_id,
-                    **data[0]["updated_fields"]
+                    **data["updated_fields"]
                     }]
 
             self._session.execute(

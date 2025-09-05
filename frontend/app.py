@@ -1,9 +1,6 @@
 import sys
 
-from PyQt6.QtWidgets import (
-    QApplication,
-    QMainWindow,
-)
+from PyQt6.QtWidgets import QApplication
 
 from views.login_view import LoginView
 from main_window import MainWindow

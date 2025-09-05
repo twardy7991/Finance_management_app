@@ -42,3 +42,11 @@ class UserService:
     def get_user(self, user_id : int) -> User:
         with self.user_uow as uow:
             return uow.repository.get_user(user_id=user_id)
+        
+    def update_user(self, user_id : int, data : dict[str, str]) -> None:
+        with self.user_uow as uow:
+            data_to_update = {
+                "updated_fields" : data
+            }
+            
+            return uow.repository.update_user(user_id=user_id, data=data_to_update)

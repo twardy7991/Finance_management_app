@@ -36,11 +36,11 @@ def test_update_user(user_repository : UserRepository):
     
     user_id = 2
     
-    data = [{
+    data = {
             "updated_fields" : {
                 "address" : "Racławicka 6/4, Kraków"
             }
-        }]
+        }
     
     user_repository.update_user(user_id=user_id, data=data)
     
